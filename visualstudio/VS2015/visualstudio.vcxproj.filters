@@ -61,6 +61,8 @@
     <ClCompile Include="..\..\src\animation.cpp">
       <Filter>gfx</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\entity.cpp" />
+    <ClCompile Include="..\..\src\stage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\camera.h" />
@@ -119,6 +121,8 @@
     <ClInclude Include="..\..\src\animation.h">
       <Filter>gfx</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\entity.h" />
+    <ClInclude Include="..\..\src\stage.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="extra">
