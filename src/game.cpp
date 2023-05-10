@@ -6,17 +6,16 @@
 #include "shader.h"
 #include "input.h"
 #include "animation.h"
+#include "entity.h"
 
 #include <cmath>
 
 //some globals
-Mesh* mesh = NULL;
-Texture* texture = NULL;
-Shader* shader = NULL;
 Animation* anim = NULL;
 float angle = 0;
 float mouse_speed = 100.0f;
 FBO* fbo = NULL;
+Entity* ambulance;
 
 Game* Game::instance = NULL;
 
@@ -43,6 +42,13 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	camera->lookAt(Vector3(0.f,100.f, 100.f),Vector3(0.f,0.f,0.f), Vector3(0.f,1.f,0.f)); //position the camera and point to 0,0,0
 	camera->setPerspective(70.f,window_width/(float)window_height,0.1f,10000.f); //set the projection, we want to be perspective
 
+	// load ambulance mesh
+	EntityMesh* ambulance_meshed = new EntityMesh();
+	ambulance_meshed->mesh = Mesh::Get("data/ambulance.obj");
+	ambulance_meshed->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/color.fs");
+	ambulance = (Entity*) ambulance_meshed;
+
+	/*
 	//load one texture without using the Texture Manager (Texture::Get would use the manager)
 	texture = new Texture();
  	texture->load("data/texture.tga");
@@ -52,6 +58,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	// example of shader loading using the shaders manager
 	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+	*/
 
 	//hide the cursor
 	SDL_ShowCursor(!mouse_locked); //hide or show the mouse
@@ -75,9 +82,13 @@ void Game::render(void)
 	glDisable(GL_CULL_FACE);
    
 	//create model matrix for cube
-	Matrix44 m;
-	m.rotate(angle*DEG2RAD, Vector3(0, 1, 0));
+	//Matrix44 m;
+	//m.rotate(angle*DEG2RAD, Vector3(0, 1, 0));
 
+	// rotate ambulance
+	ambulance->render();
+
+	/*
 	if(shader)
 	{
 		//enable shader
@@ -96,6 +107,7 @@ void Game::render(void)
 		//disable shader
 		shader->disable();
 	}
+	*/
 
 	//Draw the floor grid
 	drawGrid();
@@ -111,8 +123,9 @@ void Game::update(double seconds_elapsed)
 {
 	float speed = seconds_elapsed * mouse_speed; //the speed is defined by the seconds_elapsed so it goes constant
 
-	//example
-	angle += (float)seconds_elapsed * 10.0f;
+	// rotate ambulance
+	angle = (float)seconds_elapsed * 10.0f;
+	ambulance->model.rotate(angle * DEG2RAD, Vector3(0, 1, 0));
 
 	//mouse input to rotate the cam
 	if ((Input::mouse_state & SDL_BUTTON_LEFT) || mouse_locked ) //is left button pressed?

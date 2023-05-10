@@ -34,7 +34,7 @@ public:
 	Mesh* mesh = nullptr;
 	Texture* texture = nullptr;
 	Shader* shader = nullptr;
-	Vector4 color;
+	Vector4 color = Vector4(1, 1, 1, 1);
 
 	void render();
 };

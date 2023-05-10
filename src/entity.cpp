@@ -36,9 +36,10 @@ void EntityMesh::render()
 
 	// Enable shader and pass uniforms 
 	shader->enable();
-	shader->setUniform("u_model", model);
-	shader->setUniform("u_viewproj", camera->viewprojection_matrix);
-	shader->setTexture("u_texture", texture, 0);	//TODO: que slot?
+	shader->setUniform("u_color", color);
+	shader->setUniform("u_model", getGlobalMatrix());
+	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	if (texture) shader->setTexture("u_texture", texture, 0);	//TODO: que slot?
 
 	// Render the mesh using the shader
 	mesh->render(GL_TRIANGLES);
