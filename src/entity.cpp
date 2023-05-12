@@ -39,7 +39,7 @@ void EntityMesh::render()
 	shader->setUniform("u_color", color);
 	shader->setUniform("u_model", getGlobalMatrix());
 	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
-	if (texture) shader->setTexture("u_texture", texture, 0);	//TODO: que slot?
+	if (texture) shader->setTexture("u_texture", texture, 0);
 
 	// Render the mesh using the shader
 	mesh->render(GL_TRIANGLES);

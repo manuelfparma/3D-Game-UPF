@@ -1,5 +1,6 @@
 #pragma once
 #include "entity.h"
+#include "camera.h"
 
 enum StageType {
 	INTRO_STAGE,
@@ -20,6 +21,8 @@ struct UpdateStage {
 class Stage
 {
 	public:
+		Stage();
+		Camera* camera;
 		StageType type;
 		Entity* root;
 
@@ -41,6 +44,8 @@ public:
 
 class IntroStage : public Stage {
 public:
+	Entity* ambulance;
+
 	IntroStage();
 	virtual void render() override;
 	virtual UpdateStage update(double seconds_elapsed) override;

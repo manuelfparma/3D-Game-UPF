@@ -1,5 +1,14 @@
 #include "stage.h"
 #include "game.h"
+#include "animation.h"
+#include "input.h"
+
+
+//some globals
+Animation* anim = NULL;
+float angle = 0;
+float mouse_speed = 100.0f;
+FBO* fbo = NULL;
 
 /* Constructors */
 StageManager::StageManager() {
@@ -10,8 +19,21 @@ StageManager::StageManager() {
     currentStage = stages[INTRO_STAGE];
 }
 
-IntroStage::IntroStage() {
+Stage::Stage() {
+    //create our camera
+    camera = new Camera();
+    camera->lookAt(Vector3(0.f, 100.f, 100.f), Vector3(0.f, 0.f, 0.f), Vector3(0.f, 1.f, 0.f)); //position the camera and point to 0,0,0
+    camera->setPerspective(70.f, Game::instance->window_width / (float)Game::instance->window_height, 0.1f, 10000.f); //set the projection, we want to be perspective
+}
+
+IntroStage::IntroStage() : Stage() {
     type = INTRO_STAGE;
+    EntityMesh* ambulance_meshed = new EntityMesh();
+    ambulance_meshed->mesh = Mesh::Get("data/ambulance.obj");
+    ambulance_meshed->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/color.fs");
+    ambulance = (Entity*)ambulance_meshed;
+
+    // root->addChild(ambulance);
 }
 
 PlayStage::PlayStage() {
@@ -97,16 +119,47 @@ void OutroStage::onExit(StageExitCode exitCode) {
 
 /* render functions */
 void IntroStage::render() {
+    ambulance->render();
 }
 
 void PlayStage::render() {
+    root->render();
 }
 
 void OutroStage::render() {
+    root->render();
 }
 
 /* update functions */
 UpdateStage IntroStage::update(double seconds_elapsed) {
+
+    float speed = seconds_elapsed * mouse_speed; //the speed is defined by the seconds_elapsed so it goes constant
+    
+    // rotate ambulance
+    angle = (float)seconds_elapsed * 10.0f;
+
+
+    ambulance->model.rotate(angle * DEG2RAD, Vector3(0, 1, 0));
+
+    //mouse input to rotate the cam
+    if ((Input::mouse_state & SDL_BUTTON_LEFT) || Game::instance->mouse_locked) //is left button pressed?
+    {
+        camera->rotate(Input::mouse_delta.x * 0.005f, Vector3(0.0f, -1.0f, 0.0f));
+        camera->rotate(Input::mouse_delta.y * 0.005f, camera->getLocalVector(Vector3(-1.0f, 0.0f, 0.0f)));
+    }
+
+    //async input to move the camera around
+    if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT)) speed *= 10; //move faster with left shift
+    if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) camera->move(Vector3(0.0f, 0.0f, 1.0f) * speed);
+    if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) camera->move(Vector3(0.0f, 0.0f, -1.0f) * speed);
+    if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT)) camera->move(Vector3(1.0f, 0.0f, 0.0f) * speed);
+    if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) camera->move(Vector3(-1.0f, 0.0f, 0.0f) * speed);
+
+    //to navigate with the mouse fixed in the middle
+    if (Game::instance->mouse_locked)
+        Input::centerMouse();
+
+
     return { EXIT_NONE, NO_STAGE };
 };
 
