@@ -142,8 +142,17 @@ UpdateStage IntroStage::update(double seconds_elapsed) {
 
     ambulance->model.rotate(angle * DEG2RAD, Vector3(0, 1, 0));
 
+    // lock / unlock free cam and mouse on tab press
+    if (Input::wasKeyPressed(SDL_SCANCODE_TAB)) {
+
+
+        Game::instance->mouse_locked = !Game::instance->mouse_locked;
+        SDL_ShowCursor(!Game::instance->mouse_locked); //hide or show the mouse
+
+    }
+
     //mouse input to rotate the cam
-    if ((Input::mouse_state & SDL_BUTTON_LEFT) || Game::instance->mouse_locked) //is left button pressed?
+    if (Game::instance->mouse_locked ? true : (Input::mouse_state & SDL_BUTTON_LEFT)) //is left button pressed?
     {
         camera->rotate(Input::mouse_delta.x * 0.005f, Vector3(0.0f, -1.0f, 0.0f));
         camera->rotate(Input::mouse_delta.y * 0.005f, camera->getLocalVector(Vector3(-1.0f, 0.0f, 0.0f)));
