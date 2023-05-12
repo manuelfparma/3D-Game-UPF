@@ -12,7 +12,6 @@ FBO* fbo = NULL;
 
 /* Constructors */
 StageManager::StageManager() {
-	stages.reserve(3);
 	stages.push_back(new IntroStage());
 	stages.push_back(new PlayStage());
 	stages.push_back(new OutroStage());
@@ -24,6 +23,8 @@ Stage::Stage() {
     camera = new Camera();
     camera->lookAt(Vector3(0.f, 100.f, 100.f), Vector3(0.f, 0.f, 0.f), Vector3(0.f, 1.f, 0.f)); //position the camera and point to 0,0,0
     camera->setPerspective(70.f, Game::instance->window_width / (float)Game::instance->window_height, 0.1f, 10000.f); //set the projection, we want to be perspective
+
+    root = new Entity();
 }
 
 IntroStage::IntroStage() : Stage() {
@@ -33,7 +34,7 @@ IntroStage::IntroStage() : Stage() {
     ambulance_meshed->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/color.fs");
     ambulance = (Entity*)ambulance_meshed;
 
-    // root->addChild(ambulance);
+    root->addChild(ambulance);
 }
 
 PlayStage::PlayStage() {
@@ -119,7 +120,7 @@ void OutroStage::onExit(StageExitCode exitCode) {
 
 /* render functions */
 void IntroStage::render() {
-    ambulance->render();
+    root->render();
 }
 
 void PlayStage::render() {

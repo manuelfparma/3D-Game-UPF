@@ -4,8 +4,9 @@
 void Entity::render()
 {
 	// Render all children
-	for (int i = 0; i < children.size(); i++)
+	for (int i = 0; i < children.size(); i++) {
 		children[i]->render();
+	}
 }
 
 Matrix44 Entity::getGlobalMatrix()
