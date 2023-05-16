@@ -37,4 +37,51 @@ public:
 	Vector4 color = Vector4(1, 1, 1, 1);
 
 	void render();
+
+	EntityMesh();
 };
+
+enum {
+	NONE = 0,
+	CHARACTER,
+	WALL,
+	FLOOR,
+	SCENARIO = WALL | FLOOR,
+	ALL = CHARACTER | SCENARIO
+};
+
+class EntityCollider : public EntityMesh {
+public:
+	bool isDynamic = false;
+	int layer = NONE;
+	bool testCollision(EntityCollider* entity);
+
+	EntityCollider(bool isDynamic, int layer);
+};
+
+class EntityPlayer : public EntityCollider {
+public:
+	float yaw;
+	float pitch;
+	float roll;
+	
+	float speed;
+	float jumpSpeed;
+	bool isOnFloor;
+
+	Vector3 velocity;
+
+	EntityPlayer();
+	void update(float seconds_elapsed);
+};
+
+
+
+
+
+
+/*
+
+if ( entity->layer & SCENARIO ) {}
+
+*/

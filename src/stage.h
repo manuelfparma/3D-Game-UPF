@@ -1,6 +1,8 @@
 #pragma once
 #include "entity.h"
 #include "camera.h"
+#include "world.h"
+
 
 enum StageType {
 	INTRO_STAGE,
@@ -9,27 +11,17 @@ enum StageType {
 	NO_STAGE
 };
 
-enum StageExitCode {
-	EXIT_NONE = 0
-};
-
-struct UpdateStage {
-	StageExitCode exitCode;
-	StageType nextStage;
-};
-
 class Stage
 {
 	public:
 		Stage();
-		Camera* camera;
 		StageType type;
-		Entity* root;
+		World* world;
 
 		virtual void render() {};
-		virtual UpdateStage	update(double seconds_elapsed) { return { EXIT_NONE, NO_STAGE }; };
-		virtual void onEnter(StageExitCode enterCode) {};
-		virtual void onExit(StageExitCode exitCode) {};
+		virtual void update(double seconds_elapsed) {};
+		virtual void onEnter(int enterCode) {};
+		virtual void onExit(int exitCode) {};
 };
 
 class StageManager {
@@ -37,7 +29,7 @@ public:
 	std::vector<Stage*> stages;
 	Stage* currentStage;
 	StageManager();
-	void changeStage(Stage* newState, StageExitCode exitCode);
+	void changeStage(Stage* newState, int exitCode);
 	void render();
 	void update(double seconds_elapsed);
 };
@@ -48,25 +40,25 @@ public:
 
 	IntroStage();
 	virtual void render() override;
-	virtual UpdateStage update(double seconds_elapsed) override;
-	virtual void onEnter(StageExitCode enterCode) override;
-	virtual void onExit(StageExitCode exitCode) override;
+	virtual void update(double seconds_elapsed) override;
+	virtual void onEnter(int enterCode) override;
+	virtual void onExit(int exitCode) override;
 };
 
 class PlayStage : public Stage {
 public:
 	PlayStage();
 	virtual void render() override;
-	virtual UpdateStage update(double seconds_elapsed) override;
-	virtual void onEnter(StageExitCode enterCode) override;
-	virtual void onExit(StageExitCode exitCode) override;
+	virtual void update(double seconds_elapsed) override;
+	virtual void onEnter(int enterCode) override;
+	virtual void onExit(int exitCode) override;
 };
 
 class OutroStage : public Stage {
 public:
 	OutroStage();
 	virtual void render() override;
-	virtual UpdateStage update(double seconds_elapsed) override;
-	virtual void onEnter(StageExitCode enterCode) override;
-	virtual void onExit(StageExitCode exitCode) override;
+	virtual void update(double seconds_elapsed) override;
+	virtual void onEnter(int enterCode) override;
+	virtual void onExit(int exitCode) override;
 };

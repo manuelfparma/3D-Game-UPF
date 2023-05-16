@@ -241,6 +241,8 @@ class Matrix44
 
 		//create a transformation matrix from scratch
 		void setTranslation(float x, float y, float z);
+		void setTranslation(Vector3 vector);
+
 		void setRotation( float angle_in_rad, const Vector3& axis );
 		void setScale(float x, float y, float z);
 

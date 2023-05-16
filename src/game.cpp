@@ -61,7 +61,7 @@ void Game::render(void)
 
 	//set the camera as default
 	
-	stageManager->currentStage->camera->enable();
+	stageManager->currentStage->world->camera->enable();
 
 	//set flags
 	glDisable(GL_BLEND);
@@ -158,7 +158,7 @@ void Game::onResize(int width, int height)
 {
     std::cout << "window resized: " << width << "," << height << std::endl;
 	glViewport( 0,0, width, height );
-	stageManager->currentStage->camera->aspect =  width / (float)height;
+	stageManager->currentStage->world->camera->aspect =  width / (float)height;
 	window_width = width;
 	window_height = height;
 }

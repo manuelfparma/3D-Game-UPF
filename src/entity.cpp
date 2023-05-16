@@ -1,5 +1,6 @@
 #include "entity.h"
 #include "camera.h"
+#include "input.h"
 
 void Entity::render()
 {
@@ -50,4 +51,69 @@ void EntityMesh::render()
 
 	// Call children render
 	Entity::render();
+}
+
+
+EntityMesh::EntityMesh() : Entity() {
+
+}
+
+EntityCollider::EntityCollider(bool isDynamic, int layer ) : EntityMesh() {
+	isDynamic = isDynamic;
+	layer = layer;
+}
+
+EntityPlayer::EntityPlayer() : EntityCollider(true, CHARACTER) {
+	float yaw = 0.0f;
+	float pitch = 0.0f;
+	float roll = 0.0f;
+
+	float speed = 10.0f;
+	float jump_speed = 30.0f;
+
+	float gravity_speed = 2.5f;
+
+	Vector3 velocity;
+}
+
+void EntityPlayer::update(float seconds_elapsed){
+	
+	yaw -= Input::mouse_delta.x * seconds_elapsed * 10.f * DEG2RAD;
+	pitch -= Input::mouse_delta.y * seconds_elapsed * 10.f * DEG2RAD;
+	pitch = clamp(pitch, -M_PI * 0.3f, M_PI * 0.3f);
+
+	Matrix44 mYaw;
+	Matrix44 mPitch;
+
+	mYaw.setRotation(yaw, Vector3(0, 1, 0));
+	mPitch.setRotation(pitch, Vector3(-1, 0, 0));
+
+	Vector3 front = (mPitch * mYaw).frontVector();
+	Vector3 eye;
+	Vector3 center;
+	Vector3 position = model.getTranslation();
+
+	Vector3 move_dir;
+
+	Vector3 move_right = mYaw.rightVector();
+	Vector3 move_front = mYaw.frontVector();
+
+	if (Input::isKeyPressed(SDL_SCANCODE_W)) move_dir = move_dir + move_front;
+	if (Input::isKeyPressed(SDL_SCANCODE_D)) move_dir = move_dir + move_right;
+	if (Input::isKeyPressed(SDL_SCANCODE_A)) move_dir = move_dir - move_right;
+	if (Input::isKeyPressed(SDL_SCANCODE_S)) move_dir = move_dir - move_front;
+
+
+	if (move_dir.length()) move_dir.normalize();
+	velocity = velocity + move_dir * speed;
+	
+	position = position + velocity * seconds_elapsed;
+
+	velocity.x *= 0.5;
+	velocity.z *= 0.5;
+
+	printf("%f, %f, %f\n", position.x, position.y, position.z);
+
+	model.setTranslation(position);
+	model.rotate(yaw, Vector3(0, 1, 0));
 }
