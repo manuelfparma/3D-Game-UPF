@@ -15,7 +15,8 @@
 #include "animation.h"
 #include "extra/coldet/coldet.h"
 
-bool Mesh::use_binary = true;			//checks if there is .wbin, it there is one tries to read it instead of the other file
+//TODO: change to true for release
+bool Mesh::use_binary = false;			//checks if there is .wbin, it there is one tries to read it instead of the other file
 bool Mesh::auto_upload_to_vram = true;	//uploads the mesh to the GPU VRAM to speed up rendering
 bool Mesh::interleave_meshes = true;	//places the geometry in an interleaved array
 
@@ -284,7 +285,7 @@ void Mesh::drawCall(unsigned int primitive, int submesh_id, int draw_call_id, in
 		{
 			assert(indices_vbo_id && "indices must be uploaded to the GPU");
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_vbo_id);
-			glDrawElementsInstanced(primitive, size * 3, GL_UNSIGNED_INT, (void*)(start + sizeof(Vector3)), num_instances);
+			glDrawElementsInstanced(primitive, size * 3, GL_UNSIGNED_INT, (void*)(start * sizeof(Vector3)), num_instances);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 		else
@@ -1629,7 +1630,7 @@ void Mesh::updateBoundingBox()
 	else if (interleaved.size())
 	{
 		aabb_max = aabb_min = interleaved[0].vertex;
-		for (int i = 1; i < vertices.size(); ++i)
+		for (int i = 1; i < interleaved.size(); ++i)
 		{
 			aabb_min.setMin(interleaved[i].vertex);
 			aabb_max.setMax(interleaved[i].vertex);
