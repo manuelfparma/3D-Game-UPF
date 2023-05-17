@@ -25,7 +25,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	frame = 0;
 	time = 0.0f;
 	elapsed_time = 0.0f;
-	mouse_locked = false;
+	mouse_locked = true;
 
 	//OpenGL flags
 	glEnable( GL_CULL_FACE ); //render both sides of every triangle
@@ -141,8 +141,6 @@ void Game::onMouseButtonDown( SDL_MouseButtonEvent event )
 {
 	if (event.button == SDL_BUTTON_MIDDLE) //middle mouse
 	{
-		mouse_locked = !mouse_locked;
-		SDL_ShowCursor(!mouse_locked);
 	}
 }
 

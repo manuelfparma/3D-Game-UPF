@@ -14,14 +14,16 @@ class World
 {
 public:
 	Camera* camera;
+	bool freeCam = false;
 	Entity* root;
 	EntityPlayer* player;
 	std::map<std::string, sRenderData> meshes_to_load;
 
 	World(const char* sceneFilename);
+	bool parseScene(const char* filename);
 	void render();
 	void update(double seconds_elapsed);
-	bool parseScene(const char* filename);
+	void updateCamera(double seconds_elapsed);
 	
 };
 

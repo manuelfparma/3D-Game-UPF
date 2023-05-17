@@ -88,16 +88,15 @@ EntityCollider::EntityCollider(bool isDynamic, int layer ) {
 }
 
 EntityPlayer::EntityPlayer() : EntityCollider(true, CHARACTER) {
-	float yaw = 0.0f;
-	float pitch = 0.0f;
-	float roll = 0.0f;
+	yaw = 0.0f;
+	pitch = 0.0f;
+	roll = 0.0f;
 
-	float speed = 10.0f;
-	float jump_speed = 30.0f;
+	speed = 10.0f;
+	//jump_speed = 30.0f;
+	//gravity_speed = 2.5f;
 
-	float gravity_speed = 2.5f;
-
-	Vector3 velocity;
+	velocity = Vector3(0,0,0);
 }
 
 void EntityPlayer::update(float seconds_elapsed){
@@ -122,21 +121,20 @@ void EntityPlayer::update(float seconds_elapsed){
 	Vector3 move_right = mYaw.rightVector();
 	Vector3 move_front = mYaw.frontVector();
 
+	//if (Input::isKeyPressed(SDL_SCANCODE_W)) 
 	if (Input::isKeyPressed(SDL_SCANCODE_W)) move_dir = move_dir + move_front;
-	if (Input::isKeyPressed(SDL_SCANCODE_D)) move_dir = move_dir + move_right;
-	if (Input::isKeyPressed(SDL_SCANCODE_A)) move_dir = move_dir - move_right;
+	if (Input::isKeyPressed(SDL_SCANCODE_A)) move_dir = move_dir + move_right;
+	if (Input::isKeyPressed(SDL_SCANCODE_D)) move_dir = move_dir - move_right;
 	if (Input::isKeyPressed(SDL_SCANCODE_S)) move_dir = move_dir - move_front;
 
 
-	// if (move_dir.length()) move_dir.normalize();
+	if (move_dir.length() > 0.01) move_dir.normalize();
 	velocity = velocity + move_dir * speed;
 	
 	position = position + velocity * seconds_elapsed;
 
-	/*
 	velocity.x *= 0.5;
 	velocity.z *= 0.5;
-	*/
 	model.setTranslation(position);
 	model.rotate(yaw, Vector3(0, 1, 0));
 }

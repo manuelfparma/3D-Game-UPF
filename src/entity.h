@@ -24,6 +24,9 @@ public:
 	Entity* parent = nullptr;
 	std::vector<Entity*> children;
 
+	// isInstanced, models
+
+
 	void addChild(Entity* child);
 	void removeChild(Entity* child);
 };
@@ -65,6 +68,9 @@ public:
 	bool isDynamic = false;
 	int layer = NONE;
 	bool testCollision(EntityCollider* entity);
+
+	//sphereRadius, etc
+	// void get COllisions
 
 	EntityCollider(bool isDynamic, int layer);
 };

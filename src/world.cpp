@@ -25,49 +25,71 @@ World::World(const char* sceneFilename) {
 
 void World::render() {
 
-    Matrix44 mYaw;
-    Matrix44 mPitch;
+	if (!freeCam) {
 
-    mYaw.setRotation(player->yaw, Vector3(0, 1, 0));
-    mPitch.setRotation(player->pitch, Vector3(-1, 0, 0));
-    
-    Vector3 front = (mPitch * mYaw).frontVector();
-    Vector3 eye;
-    Vector3 center;
+		Matrix44 mYaw;
+		Matrix44 mPitch;
 
-    #define FIRST_PERSON false
+		mYaw.setRotation(player->yaw, Vector3(0, 1, 0));
+		mPitch.setRotation(player->pitch, Vector3(-1, 0, 0));
 
-    if (FIRST_PERSON) {
-        eye = player->getGlobalMatrix() * Vector3(0.f, 2.f, 0.5f);
-        center = eye + front;
-    }
-    else {
-        eye = player->model.getTranslation() - front * 5.0f;
-        center = player->getGlobalMatrix() * Vector3(0, 2.0f, 0.5f);
-    }
+		Vector3 front = (mPitch * mYaw).frontVector();
+		Vector3 eye;
+		Vector3 center;
 
-    camera->lookAt(eye, center, Vector3(0, 1, 0));
+		#define FIRST_PERSON true
+
+		if (FIRST_PERSON) {
+			eye = player->getGlobalMatrix() * Vector3(0.f, 2.f, 0.5f);
+			center = eye + front;
+		}
+		else {
+			eye = player->model.getTranslation() - front * 5.0f;
+			center = player->getGlobalMatrix() * Vector3(0, 2.0f, 0.5f);
+		}
+
+			camera->lookAt(eye, center, Vector3(0, 1, 0));
+	}
 
     root->render();
 }
 
+
 void World::update(double seconds_elapsed) {
-    // rotate ambulance
-    angle = (float)seconds_elapsed * 10.0f;
 
-    player->update(seconds_elapsed);
 
-    //mouse input to rotate the cam
-    /*if (Game::instance->mouse_locked ? true : (Input::mouse_state & SDL_BUTTON_LEFT)) //is left button pressed?
-    {
-        camera->rotate(Input::mouse_delta.x * 0.005f, Vector3(0.0f, -1.0f, 0.0f));
-        camera->rotate(Input::mouse_delta.y * 0.005f, camera->getLocalVector(Vector3(-1.0f, 0.0f, 0.0f)));
-    }
-    */
+	if (!freeCam) {
+		player->update(seconds_elapsed);
+	}
+	else {
+		updateCamera(seconds_elapsed);
+	}
 
     //to navigate with the mouse fixed in the middle
     if (Game::instance->mouse_locked)
         Input::centerMouse();
+
+	if (Input::wasKeyPressed(SDL_SCANCODE_TAB)) {
+		Game::instance->mouse_locked = !Game::instance->mouse_locked;
+		SDL_ShowCursor(!Game::instance->mouse_locked);
+		freeCam = !freeCam;
+	}
+}
+
+void World::updateCamera(double seconds_elapsed) {
+
+	float speed = 10.f;
+	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT)) speed *= 10; //move faster with left shift
+	if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) camera->move(Vector3(0.0f, 0.0f, 1.0f) * speed);
+	if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) camera->move(Vector3(0.0f, 0.0f, -1.0f) * speed);
+	if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT)) camera->move(Vector3(1.0f, 0.0f, 0.0f) * speed);
+	if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) camera->move(Vector3(-1.0f, 0.0f, 0.0f) * speed);
+
+	if (Input::mouse_state & SDL_BUTTON_LEFT) //is left button pressed?
+	{
+		camera->rotate(Input::mouse_delta.x * 0.005f, Vector3(0.0f, -1.0f, 0.0f));
+		camera->rotate(Input::mouse_delta.y * 0.005f, camera->getLocalVector(Vector3(-1.0f, 0.0f, 0.0f)));
+	}
 }
 
 bool World::parseScene(const char* filename)
