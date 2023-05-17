@@ -381,3 +381,11 @@ MigrationBackup/
 *.out
 *.app
 
+# Exclude all .obj files
+*.obj
+
+# Include data directory and its contents
+!/data/
+
+# Include .obj files inside data directory
+!/data/**/*.obj
