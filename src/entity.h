@@ -36,9 +36,19 @@ public:
 	Shader* shader = nullptr;
 	Vector4 color = Vector4(1, 1, 1, 1);
 
-	void render();
+	void render() override;
 
-	EntityMesh();
+	EntityMesh() {};
+	EntityMesh(Mesh* mesh, Texture* texture, Shader* shader);
+};
+
+class InstancedEntityMesh : public EntityMesh {
+public:
+	std::vector<Matrix44> models;
+
+	void render() override;
+
+	using EntityMesh::EntityMesh;
 };
 
 enum {
@@ -74,10 +84,6 @@ public:
 	EntityPlayer();
 	void update(float seconds_elapsed);
 };
-
-
-
-
 
 
 /*

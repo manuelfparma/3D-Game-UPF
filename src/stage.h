@@ -36,8 +36,6 @@ public:
 
 class IntroStage : public Stage {
 public:
-	Entity* ambulance;
-
 	IntroStage();
 	virtual void render() override;
 	virtual void update(double seconds_elapsed) override;

@@ -2,14 +2,6 @@
 #include "camera.h"
 #include "input.h"
 
-void Entity::render()
-{
-	// Render all children
-	for (int i = 0; i < children.size(); i++) {
-		children[i]->render();
-	}
-}
-
 Matrix44 Entity::getGlobalMatrix()
 {
 	if (parent)
@@ -31,11 +23,19 @@ void Entity::removeChild(Entity* child)
 	child->parent = nullptr;
 }
 
+
+void Entity::render()
+{
+	// Render all children
+	for (int i = 0; i < children.size(); i++) {
+		children[i]->render();
+	}
+}
+
 void EntityMesh::render()
 {
 	// Get the last camera that was activated 
 	Camera* camera = Camera::current;
-
 	// Enable shader and pass uniforms 
 	shader->enable();
 	shader->setUniform("u_color", color);
@@ -53,12 +53,36 @@ void EntityMesh::render()
 	Entity::render();
 }
 
+void InstancedEntityMesh::render()
+{
+	// Get the last camera that was activated 
+	Camera* camera = Camera::current;
+	// Enable shader and pass uniforms
+	
+	shader->enable();
+	shader->setUniform("u_color", color);
+	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	if (texture) shader->setTexture("u_texture", texture, 0);
 
-EntityMesh::EntityMesh() : Entity() {
+	// Render the mesh using the shader
+	mesh->renderInstanced(GL_TRIANGLES, models.data(), models.size());
 
+	// Disable shader after finishing rendering
+	shader->disable();
+
+	// Call children render
+	Entity::render();
 }
 
-EntityCollider::EntityCollider(bool isDynamic, int layer ) : EntityMesh() {
+
+EntityMesh::EntityMesh(Mesh* mesh, Texture* texture, Shader* shader) : Entity() {
+	this->mesh = mesh;
+	this->texture = texture;
+	this->shader = shader;
+}
+
+
+EntityCollider::EntityCollider(bool isDynamic, int layer ) {
 	isDynamic = isDynamic;
 	layer = layer;
 }
@@ -104,16 +128,15 @@ void EntityPlayer::update(float seconds_elapsed){
 	if (Input::isKeyPressed(SDL_SCANCODE_S)) move_dir = move_dir - move_front;
 
 
-	if (move_dir.length()) move_dir.normalize();
+	// if (move_dir.length()) move_dir.normalize();
 	velocity = velocity + move_dir * speed;
 	
 	position = position + velocity * seconds_elapsed;
 
+	/*
 	velocity.x *= 0.5;
 	velocity.z *= 0.5;
-
-	printf("%f, %f, %f\n", position.x, position.y, position.z);
-
+	*/
 	model.setTranslation(position);
 	model.rotate(yaw, Vector3(0, 1, 0));
 }

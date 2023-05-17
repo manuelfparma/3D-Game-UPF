@@ -14,11 +14,11 @@ StageManager::StageManager() {
 }
 
 Stage::Stage() {
-    world = new World();
 }
 
 IntroStage::IntroStage() : Stage() {
     type = INTRO_STAGE;
+    world = new World("data/myscene.scene");
 
     /*
     EntityMesh* ambulance_meshed = new EntityMesh();
