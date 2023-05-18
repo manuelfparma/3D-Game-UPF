@@ -15,6 +15,7 @@ class World
 public:
 	Camera* camera;
 	bool freeCam = false;
+	bool firstPerson = true;
 	Entity* root;
 	EntityPlayer* player;
 	std::map<std::string, sRenderData> meshes_to_load;

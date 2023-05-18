@@ -37,9 +37,7 @@ void World::render() {
 		Vector3 eye;
 		Vector3 center;
 
-		#define FIRST_PERSON true
-
-		if (FIRST_PERSON) {
+		if (firstPerson) {
 			eye = player->getGlobalMatrix() * Vector3(0.f, 2.f, 0.5f);
 			center = eye + front;
 		}
@@ -73,6 +71,10 @@ void World::update(double seconds_elapsed) {
 		Game::instance->mouse_locked = !Game::instance->mouse_locked;
 		SDL_ShowCursor(!Game::instance->mouse_locked);
 		freeCam = !freeCam;
+	}
+
+	if (Input::wasKeyPressed(SDL_SCANCODE_C)) {
+		firstPerson = !firstPerson;
 	}
 }
 
@@ -148,9 +150,7 @@ bool World::parseScene(const char* filename)
 		// Create instanced entity
 		if (render_data.models.size() > 1) {
 
-			InstancedEntityMesh* new_entity = new InstancedEntityMesh(Mesh::Get(mesh_name.c_str()), defaultTexture, instancedShader);
-			// Add all instances
-			new_entity->models = render_data.models;
+			EntityMesh* new_entity = new EntityMesh(Mesh::Get(mesh_name.c_str()), defaultTexture, instancedShader, true, render_data.models);
 			// Add entity to scene root
 			root->addChild((Entity *)new_entity);
 		}

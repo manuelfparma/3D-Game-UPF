@@ -36,39 +36,36 @@ void EntityMesh::render()
 {
 	// Get the last camera that was activated 
 	Camera* camera = Camera::current;
-	// Enable shader and pass uniforms 
-	shader->enable();
-	shader->setUniform("u_color", color);
-	shader->setUniform("u_model", getGlobalMatrix());
-	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
-	if (texture) shader->setTexture("u_texture", texture, 0);
-
-	// Render the mesh using the shader
-	mesh->render(GL_TRIANGLES);
-
-	// Disable shader after finishing rendering
-	shader->disable();
-
-	// Call children render
-	Entity::render();
-}
-
-void InstancedEntityMesh::render()
-{
-	// Get the last camera that was activated 
-	Camera* camera = Camera::current;
-	// Enable shader and pass uniforms
 	
-	shader->enable();
-	shader->setUniform("u_color", color);
-	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
-	if (texture) shader->setTexture("u_texture", texture, 0);
+	// Enable shader and pass uniforms 
 
-	// Render the mesh using the shader
-	mesh->renderInstanced(GL_TRIANGLES, models.data(), models.size());
+	if (isInstanced) {
+		shader->enable();
+		shader->setUniform("u_color", color);
+		shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+		if (texture) shader->setTexture("u_texture", texture, 0);
 
-	// Disable shader after finishing rendering
-	shader->disable();
+		// Render the mesh using the shader
+		mesh->renderInstanced(GL_TRIANGLES, models.data(), models.size());
+
+		// Disable shader after finishing rendering
+		shader->disable();
+	}
+	else {
+		shader->enable();
+		shader->setUniform("u_color", color);
+		shader->setUniform("u_model", getGlobalMatrix());
+		shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+		if (texture) shader->setTexture("u_texture", texture, 0);
+
+		// Render the mesh using the shader
+		mesh->render(GL_TRIANGLES);
+
+		// Disable shader after finishing rendering
+		shader->disable();
+	}
+
+	
 
 	// Call children render
 	Entity::render();
@@ -79,6 +76,14 @@ EntityMesh::EntityMesh(Mesh* mesh, Texture* texture, Shader* shader) : Entity() 
 	this->mesh = mesh;
 	this->texture = texture;
 	this->shader = shader;
+}
+
+EntityMesh::EntityMesh(Mesh* mesh, Texture* texture, Shader* shader, bool isInstanced, std::vector<Matrix44> models) : Entity() {
+	this->mesh = mesh;
+	this->texture = texture;
+	this->shader = shader;
+	this->isInstanced = isInstanced;
+	this->models = models;
 }
 
 
@@ -121,15 +126,18 @@ void EntityPlayer::update(float seconds_elapsed){
 	Vector3 move_right = mYaw.rightVector();
 	Vector3 move_front = mYaw.frontVector();
 
+
+	float curSpeed = speed;
 	//if (Input::isKeyPressed(SDL_SCANCODE_W)) 
 	if (Input::isKeyPressed(SDL_SCANCODE_W)) move_dir = move_dir + move_front;
 	if (Input::isKeyPressed(SDL_SCANCODE_A)) move_dir = move_dir + move_right;
 	if (Input::isKeyPressed(SDL_SCANCODE_D)) move_dir = move_dir - move_right;
 	if (Input::isKeyPressed(SDL_SCANCODE_S)) move_dir = move_dir - move_front;
+	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT))  curSpeed *= 0.3;
 
 
 	if (move_dir.length() > 0.01) move_dir.normalize();
-	velocity = velocity + move_dir * speed;
+	velocity = velocity + move_dir * curSpeed;
 	
 	position = position + velocity * seconds_elapsed;
 

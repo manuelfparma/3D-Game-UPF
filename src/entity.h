@@ -24,7 +24,6 @@ public:
 	Entity* parent = nullptr;
 	std::vector<Entity*> children;
 
-	// isInstanced, models
 
 
 	void addChild(Entity* child);
@@ -39,19 +38,14 @@ public:
 	Shader* shader = nullptr;
 	Vector4 color = Vector4(1, 1, 1, 1);
 
-	void render() override;
-
-	EntityMesh() {};
-	EntityMesh(Mesh* mesh, Texture* texture, Shader* shader);
-};
-
-class InstancedEntityMesh : public EntityMesh {
-public:
+	bool isInstanced = false;
 	std::vector<Matrix44> models;
 
 	void render() override;
 
-	using EntityMesh::EntityMesh;
+	EntityMesh() {};
+	EntityMesh(Mesh* mesh, Texture* texture, Shader* shader);
+	EntityMesh(Mesh* mesh, Texture* texture, Shader* shader, bool isInstanced, std::vector<Matrix44> models);
 };
 
 enum {
