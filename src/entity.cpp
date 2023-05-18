@@ -39,33 +39,21 @@ void EntityMesh::render()
 	
 	// Enable shader and pass uniforms 
 
+	shader->enable();	
+	shader->setUniform("u_color", color);
+	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	if (texture) shader->setTexture("u_texture", texture, 0);
+	
 	if (isInstanced) {
-		shader->enable();
-		shader->setUniform("u_color", color);
-		shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
-		if (texture) shader->setTexture("u_texture", texture, 0);
-
-		// Render the mesh using the shader
 		mesh->renderInstanced(GL_TRIANGLES, models.data(), models.size());
-
-		// Disable shader after finishing rendering
-		shader->disable();
 	}
 	else {
-		shader->enable();
-		shader->setUniform("u_color", color);
 		shader->setUniform("u_model", getGlobalMatrix());
-		shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
-		if (texture) shader->setTexture("u_texture", texture, 0);
-
-		// Render the mesh using the shader
 		mesh->render(GL_TRIANGLES);
-
-		// Disable shader after finishing rendering
-		shader->disable();
 	}
-
 	
+	// Disable shader after finishing rendering
+	shader->disable();	
 
 	// Call children render
 	Entity::render();
@@ -93,15 +81,23 @@ EntityCollider::EntityCollider(bool isDynamic, int layer ) {
 }
 
 EntityPlayer::EntityPlayer() : EntityCollider(true, CHARACTER) {
+
+	// Rotation
 	yaw = 0.0f;
 	pitch = 0.0f;
 	roll = 0.0f;
 
+	// Movement
 	speed = 10.0f;
-	//jump_speed = 30.0f;
-	//gravity_speed = 2.5f;
-
+	jump_speed = 300.0f;
+	gravity_speed = 2.5f;
 	velocity = Vector3(0,0,0);
+	velocity_decrease_factor = 0.5;
+	isOnFloor = true;
+
+	// Model
+	mesh = Mesh::Get("data/character.obj");
+	shader = Shader::getDefaultShader("flat");
 }
 
 void EntityPlayer::update(float seconds_elapsed){
@@ -126,7 +122,6 @@ void EntityPlayer::update(float seconds_elapsed){
 	Vector3 move_right = mYaw.rightVector();
 	Vector3 move_front = mYaw.frontVector();
 
-
 	float curSpeed = speed;
 	//if (Input::isKeyPressed(SDL_SCANCODE_W)) 
 	if (Input::isKeyPressed(SDL_SCANCODE_W)) move_dir = move_dir + move_front;
@@ -135,14 +130,32 @@ void EntityPlayer::update(float seconds_elapsed){
 	if (Input::isKeyPressed(SDL_SCANCODE_S)) move_dir = move_dir - move_front;
 	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT))  curSpeed *= 0.3;
 
+	if (!isOnFloor) {
+		velocity.y -= 2.5;
+	}
+	else {
+		if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
+			velocity.y += jump_speed;
+			isOnFloor = false;
+		}
+	}
 
 	if (move_dir.length() > 0.01) move_dir.normalize();
-	velocity = velocity + move_dir * curSpeed;
+	velocity += move_dir * curSpeed;
 	
-	position = position + velocity * seconds_elapsed;
+	position += velocity * seconds_elapsed;
 
 	velocity.x *= 0.5;
 	velocity.z *= 0.5;
 	model.setTranslation(position);
 	model.rotate(yaw, Vector3(0, 1, 0));
+}
+
+
+bool EntityCollider::testCollision(EntityCollider* other) {
+	return false;
+}
+
+bool EntityCollider::testCollision(std::vector<EntityCollider*> vector) {
+	return false;
 }

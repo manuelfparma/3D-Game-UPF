@@ -1,7 +1,7 @@
 # Blender v3.5.1 OBJ File: 'test_scene.blend'
 # www.blender.org
 mtllib Cube.001.mtl
-o Cube.004_Cube.001
+o Cube.003_Cube.001
 v 121.552444 12.155245 -12.155245
 v 121.552444 -12.155245 -12.155245
 v 121.552444 12.155245 12.155245

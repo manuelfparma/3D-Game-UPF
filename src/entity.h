@@ -62,32 +62,37 @@ public:
 	bool isDynamic = false;
 	int layer = NONE;
 	bool testCollision(EntityCollider* entity);
+	bool testCollision(std::vector<EntityCollider*> entity);
+
 
 	//sphereRadius, etc
 	// void get COllisions
+
+	/*
+
+	if ( entity->layer & SCENARIO ) {}
+
+	*/
 
 	EntityCollider(bool isDynamic, int layer);
 };
 
 class EntityPlayer : public EntityCollider {
 public:
+	// Rotation
 	float yaw;
 	float pitch;
 	float roll;
-	
+
+	// Movement
+	float jump_speed;
 	float speed;
-	float jumpSpeed;
+	float gravity_speed;
+	Vector3 velocity;
+	float velocity_decrease_factor;
 	bool isOnFloor;
 
-	Vector3 velocity;
 
-	EntityPlayer();
 	void update(float seconds_elapsed);
+	EntityPlayer();
 };
-
-
-/*
-
-if ( entity->layer & SCENARIO ) {}
-
-*/

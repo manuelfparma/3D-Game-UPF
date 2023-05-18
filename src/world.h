@@ -9,6 +9,11 @@ struct sRenderData {
 	std::vector<Matrix44> models;
 };
 
+struct sCollisionData {
+	Vector3 colPoint;
+	Vector3 colNormal;
+};
+
 
 class World
 {
@@ -25,6 +30,8 @@ public:
 	void render();
 	void update(double seconds_elapsed);
 	void updateCamera(double seconds_elapsed);
+	bool checkPlayerCollision(const Vector3& target, std::vector<sCollisionData>* collisions);
+	bool checkLineOfSight(Matrix44& obs, Matrix44& target);
 	
 };
 

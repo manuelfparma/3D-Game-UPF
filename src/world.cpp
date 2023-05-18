@@ -42,16 +42,16 @@ void World::render() {
 			center = eye + front;
 		}
 		else {
-			eye = player->model.getTranslation() - front * 5.0f;
+			eye = player->model.getTranslation() - front * 10.0f;
 			center = player->getGlobalMatrix() * Vector3(0, 2.0f, 0.5f);
 		}
 
-			camera->lookAt(eye, center, Vector3(0, 1, 0));
+		camera->lookAt(eye, center, Vector3(0, 1, 0));
 	}
 
-    root->render();
+    root->render(); 
+	player->render();
 }
-
 
 void World::update(double seconds_elapsed) {
 
@@ -92,6 +92,43 @@ void World::updateCamera(double seconds_elapsed) {
 		camera->rotate(Input::mouse_delta.x * 0.005f, Vector3(0.0f, -1.0f, 0.0f));
 		camera->rotate(Input::mouse_delta.y * 0.005f, camera->getLocalVector(Vector3(-1.0f, 0.0f, 0.0f)));
 	}
+}
+
+bool World::checkPlayerCollision(const Vector3& target, std::vector<sCollisionData>* collisions) {
+	return true;
+}
+
+bool World::checkLineOfSight(Matrix44& obs, Matrix44& target) {
+	Vector3 front = normalize(obs.frontVector());
+	Vector3 toTarget = target.getTranslation() - obs.getTranslation();
+
+	float distance = toTarget.length();
+
+	Vector3 rayOrigin;
+	Vector3 direction = normalize(toTarget);
+
+	if (toTarget.dot(front) > 0.5)
+	{
+		for (auto e : root->children)
+		{
+			EntityCollider* ec = dynamic_cast<EntityCollider*>(e);
+
+			if (!ec) continue;
+
+			if (ec->mesh->testRayCollision(
+				ec->model,
+				rayOrigin,
+				direction,
+				Vector3(),
+				Vector3(),
+				distance
+			)) return false;
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 bool World::parseScene(const char* filename)
