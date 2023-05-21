@@ -133,47 +133,46 @@ void EntityPlayer::update(float seconds_elapsed){
 	if (Input::isKeyPressed(SDL_SCANCODE_D)) move_dir = move_dir - move_right;
 	if (Input::isKeyPressed(SDL_SCANCODE_S)) move_dir = move_dir - move_front;
 	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT))  curSpeed *= 0.3;
+	if (isOnFloor && Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
+		// jumping
+		velocity.y += jump_speed;
+	}
 
 	if (move_dir.length() > 0.01) move_dir.normalize();
 	velocity += move_dir * curSpeed;
 
-	std::vector<sCollisionData> collisions;
-	float floor = -9999.f;
+	float floor_y = -9999.f;
 
+	std::vector<sCollisionData> collisions;
 	World* world = Game::instance->stageManager->currentStage->world;
 
+	// we suppose the player is on the air
+	isOnFloor = false;
+
+	// check collisions
 	if (world->checkPlayerCollision(position + velocity * seconds_elapsed, &collisions)) {
-		for (const sCollisionData& collision : collisions){
+		for (const sCollisionData& collision : collisions) {
+			// check for floor collisions
 			float up_factor = collision.colNormal.dot(Vector3(0, 1, 0));
 
-			std::cout << collision.colPoint.y << " " << model.getTranslation().y << std::endl;
-
-			if (up_factor > 0.8){
+			if (abs(up_factor) > 0.8) {
 				isOnFloor = true;
 				velocity.y = 0;
-				floor = max(collision.colPoint.y, floor);
-			} else {
-				Vector3 newDir = velocity.dot(collision.colNormal) * collision.colNormal;
-				velocity.x -= newDir.x;
-				velocity.z -= newDir.z;
-
+				floor_y = collision.colPoint.y;
 			}
+
+			// TODO: wall collisions
 		}
-	}
-	else {
-		isOnFloor = false;
 	}
 
 	if (!isOnFloor) {
+		// gravitational pull
 		velocity.y -= 2.5;
-	}
-	else if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
-		velocity.y += jump_speed;
-		isOnFloor = false;
 	}
 
 	position += velocity * seconds_elapsed;
-	position.y = max(position.y, floor);
+	// to stop the player from going through the floor
+	position.y = max(position.y, floor_y);
 	velocity.x *= 0.5;
 	velocity.z *= 0.5;
 
