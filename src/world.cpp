@@ -95,7 +95,32 @@ void World::updateCamera(double seconds_elapsed) {
 }
 
 bool World::checkPlayerCollision(const Vector3& target, std::vector<sCollisionData>* collisions) {
-	return true;
+	Vector3 col_point;
+	Vector3 col_normal;
+
+	for (auto& e : root->children){
+		EntityCollider* ec = dynamic_cast<EntityCollider*>(e);
+
+		if (!ec) continue;
+
+		if (ec->isInstanced) {
+			for (auto& model : ec->models) {
+				//TODO: CHANGE MAX DISTANCE
+				if (!ec->mesh->testRayCollision(model, target, Vector3(0, -1, 0), col_point, col_normal, 1.f)) continue;
+				// add colision to list
+				col_normal.normalize();
+				collisions->push_back({ col_point, col_normal });
+			}
+		}
+		else {
+			if (!ec->mesh->testRayCollision(ec->model, target, Vector3(0, -1, 0), col_point, col_normal, 1.f)) continue;
+			// add colision to list
+			col_normal.normalize();
+			collisions->push_back({ col_point, col_normal });
+		}	
+	}
+
+	return !collisions->empty();
 }
 
 bool World::checkLineOfSight(Matrix44& obs, Matrix44& target) {
@@ -187,13 +212,13 @@ bool World::parseScene(const char* filename)
 		// Create instanced entity
 		if (render_data.models.size() > 1) {
 
-			EntityMesh* new_entity = new EntityMesh(Mesh::Get(mesh_name.c_str()), defaultTexture, instancedShader, true, render_data.models);
+			EntityCollider* new_entity = new EntityCollider(Mesh::Get(mesh_name.c_str()), defaultTexture, instancedShader, render_data.models);
 			// Add entity to scene root
-			root->addChild((Entity *)new_entity);
+			root->addChild(new_entity);
 		}
 		// Create normal entity
 		else {
-			EntityMesh* new_entity = new EntityMesh(Mesh::Get(mesh_name.c_str()), defaultTexture, singleShader);
+			EntityCollider* new_entity = new EntityCollider(Mesh::Get(mesh_name.c_str()), defaultTexture, singleShader);
 			new_entity->model = render_data.models[0];
 			// Add entity to scene root
 			root->addChild(new_entity);

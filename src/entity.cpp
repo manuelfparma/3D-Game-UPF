@@ -1,6 +1,10 @@
 #include "entity.h"
 #include "camera.h"
 #include "input.h"
+#include "world.h"
+#include "game.h"
+#include "stage.h"
+#include <iostream>
 
 Matrix44 Entity::getGlobalMatrix()
 {
@@ -66,11 +70,11 @@ EntityMesh::EntityMesh(Mesh* mesh, Texture* texture, Shader* shader) : Entity() 
 	this->shader = shader;
 }
 
-EntityMesh::EntityMesh(Mesh* mesh, Texture* texture, Shader* shader, bool isInstanced, std::vector<Matrix44> models) : Entity() {
+EntityMesh::EntityMesh(Mesh* mesh, Texture* texture, Shader* shader, std::vector<Matrix44> models) : Entity() {
 	this->mesh = mesh;
 	this->texture = texture;
 	this->shader = shader;
-	this->isInstanced = isInstanced;
+	this->isInstanced = true;
 	this->models = models;
 }
 
@@ -81,6 +85,7 @@ EntityCollider::EntityCollider(bool isDynamic, int layer ) {
 }
 
 EntityPlayer::EntityPlayer() : EntityCollider(true, CHARACTER) {
+	model.setTranslation(Vector3(0, 5, 0));
 
 	// Rotation
 	yaw = 0.0f;
@@ -93,7 +98,7 @@ EntityPlayer::EntityPlayer() : EntityCollider(true, CHARACTER) {
 	gravity_speed = 2.5f;
 	velocity = Vector3(0,0,0);
 	velocity_decrease_factor = 0.5;
-	isOnFloor = true;
+	isOnFloor = false;
 
 	// Model
 	mesh = Mesh::Get("data/character.obj");
@@ -101,7 +106,6 @@ EntityPlayer::EntityPlayer() : EntityCollider(true, CHARACTER) {
 }
 
 void EntityPlayer::update(float seconds_elapsed){
-	
 	yaw -= Input::mouse_delta.x * seconds_elapsed * 10.f * DEG2RAD;
 	pitch -= Input::mouse_delta.y * seconds_elapsed * 10.f * DEG2RAD;
 	pitch = clamp(pitch, -M_PI * 0.3f, M_PI * 0.3f);
@@ -130,23 +134,49 @@ void EntityPlayer::update(float seconds_elapsed){
 	if (Input::isKeyPressed(SDL_SCANCODE_S)) move_dir = move_dir - move_front;
 	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT))  curSpeed *= 0.3;
 
+	if (move_dir.length() > 0.01) move_dir.normalize();
+	velocity += move_dir * curSpeed;
+
+	std::vector<sCollisionData> collisions;
+	float floor = -9999.f;
+
+	World* world = Game::instance->stageManager->currentStage->world;
+
+	if (world->checkPlayerCollision(position + velocity * seconds_elapsed, &collisions)) {
+		for (const sCollisionData& collision : collisions){
+			float up_factor = collision.colNormal.dot(Vector3(0, 1, 0));
+
+			std::cout << collision.colPoint.y << " " << model.getTranslation().y << std::endl;
+
+			if (up_factor > 0.8){
+				isOnFloor = true;
+				velocity.y = 0;
+				floor = max(collision.colPoint.y, floor);
+			} else {
+				Vector3 newDir = velocity.dot(collision.colNormal) * collision.colNormal;
+				velocity.x -= newDir.x;
+				velocity.z -= newDir.z;
+
+			}
+		}
+	}
+	else {
+		isOnFloor = false;
+	}
+
 	if (!isOnFloor) {
 		velocity.y -= 2.5;
 	}
-	else {
-		if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
-			velocity.y += jump_speed;
-			isOnFloor = false;
-		}
+	else if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
+		velocity.y += jump_speed;
+		isOnFloor = false;
 	}
 
-	if (move_dir.length() > 0.01) move_dir.normalize();
-	velocity += move_dir * curSpeed;
-	
 	position += velocity * seconds_elapsed;
-
+	position.y = max(position.y, floor);
 	velocity.x *= 0.5;
 	velocity.z *= 0.5;
+
 	model.setTranslation(position);
 	model.rotate(yaw, Vector3(0, 1, 0));
 }

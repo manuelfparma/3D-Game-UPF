@@ -45,7 +45,7 @@ public:
 
 	EntityMesh() {};
 	EntityMesh(Mesh* mesh, Texture* texture, Shader* shader);
-	EntityMesh(Mesh* mesh, Texture* texture, Shader* shader, bool isInstanced, std::vector<Matrix44> models);
+	EntityMesh(Mesh* mesh, Texture* texture, Shader* shader, std::vector<Matrix44> models);
 };
 
 enum {
@@ -74,6 +74,7 @@ public:
 
 	*/
 
+	using EntityMesh::EntityMesh;
 	EntityCollider(bool isDynamic, int layer);
 };
 

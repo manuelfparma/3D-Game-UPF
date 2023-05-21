@@ -160,4 +160,3 @@ void Game::onResize(int width, int height)
 	window_width = width;
 	window_height = height;
 }
-
