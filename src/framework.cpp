@@ -148,7 +148,7 @@ void Vector3::parseFromText(const char* text, const char separator)
 			strncpy(num, start, current - start);
 			num[current - start] = '\0';
 			start = current + 1;
-			if (num[0] != 'x') //¿?
+			if (num[0] != 'x')
 				switch(pos)
 				{
 					case 0: x = (float)atof(num); break;
@@ -176,6 +176,14 @@ Vector3 cross(const Vector3& a, const Vector3& b)
 	return Vector3(a.y*b.z - a.z*b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x);
 }
 
+Vector3 lerp(const Vector3& a, const Vector3& b, float v)
+{
+	Vector3 r;
+	r.x = lerp(a.x, b.x, v);
+	r.y = lerp(a.y, b.y, v);
+	r.z = lerp(a.z, b.z, v);
+	return r;
+}
 
 //*********************************
 const Matrix44 Matrix44::IDENTITY;
@@ -373,6 +381,14 @@ bool Matrix44::getXYZ(float* euler) const
 	return false;
 }
 
+float Matrix44::getYawRotationToAimTo(const Vector3& position)
+{
+	Vector3 dir = position - getTranslation();
+	float dx = frontVector().dot(dir);
+	float dy = -rightVector().dot(dir);
+	float angle = std::atan2f(dy, dx);
+	return angle;
+}
 
 void Matrix44::lookAt(Vector3& eye, Vector3& center, Vector3& up)
 {
@@ -1215,7 +1231,7 @@ bool RaySphereCollision(const Vector3& center, const float& radius, const Vector
 	float b = dot(m, ray_dir);
 	float c = dot(m, m) - radius * radius;
 
-	// Exit if r’s origin outside s (c > 0) and r pointing away from s (b > 0) 
+	// Exit if rï¿½s origin outside s (c > 0) and r pointing away from s (b > 0) 
 	if (c > 0.0f && b > 0.0f)
 		return false;
 	float discr = b * b - c;

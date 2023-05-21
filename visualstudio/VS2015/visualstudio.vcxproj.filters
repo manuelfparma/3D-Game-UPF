@@ -61,6 +61,15 @@
     <ClCompile Include="..\..\src\animation.cpp">
       <Filter>gfx</Filter>
     </ClCompile>
+     <ClCompile Include="..\..\src\extra\pathfinder\AStar.cpp">
+      <Filter>extra\pathfinder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\extra\pathfinder\Dijkstra.cpp">
+      <Filter>extra\pathfinder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\extra\pathfinder\Node.cpp">
+      <Filter>extra\pathfinder</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\entity.cpp" />
     <ClCompile Include="..\..\src\stage.cpp" />
     <ClCompile Include="..\..\src\world.cpp" />
@@ -122,6 +131,15 @@
     <ClInclude Include="..\..\src\animation.h">
       <Filter>gfx</Filter>
     </ClInclude>
+     <ClCompile Include="..\..\src\extra\pathfinder\AStar.cpp">
+      <Filter>extra\pathfinder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\extra\pathfinder\Dijkstra.cpp">
+      <Filter>extra\pathfinder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\extra\pathfinder\Node.cpp">
+      <Filter>extra\pathfinder</Filter>
+    </ClCompile>
     <ClInclude Include="..\..\src\entity.h" />
     <ClInclude Include="..\..\src\stage.h" />
     <ClInclude Include="..\..\src\world.h" />
@@ -138,6 +156,9 @@
     </Filter>
     <Filter Include="utils">
       <UniqueIdentifier>{feb78646-9d96-43df-8d00-2397429ea3ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="extra\pathfinder">
+      <UniqueIdentifier>{26f60276-ff2b-44e2-9d0d-4c97df149036}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
