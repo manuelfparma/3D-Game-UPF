@@ -1,6 +1,7 @@
 #pragma once
 #include "camera.h"
 #include "entity.h"
+#include "texture.h"
 #include "game.h"
 
 struct sRenderData {
@@ -22,11 +23,13 @@ public:
 	bool freeCam = false;
 	bool firstPerson = true;
 	Entity* root;
+	EntityMesh* sky;
 	EntityPlayer* player;
 	std::map<std::string, sRenderData> meshes_to_load;
 
 	World(const char* sceneFilename);
 	bool parseScene(const char* filename);
+	void renderSky();
 	void render();
 	void update(double seconds_elapsed);
 	void updateCamera(double seconds_elapsed);

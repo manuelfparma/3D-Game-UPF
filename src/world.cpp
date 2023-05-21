@@ -19,11 +19,40 @@ World::World(const char* sceneFilename) {
 
     root = new Entity();
     player = new EntityPlayer();
+	std::vector<std::string> faces = {
+		"data/textures/skybox/right.png",
+		"data/textures/skybox/left.png",
+		"data/textures/skybox/bottom.png",
+		"data/textures/skybox/top.png",
+		"data/textures/skybox/front.png",
+		"data/textures/skybox/back.png"
+	};
+
+	Texture* skybox = new Texture();
+	skybox->loadCubemap("sky", faces);
+	
+	
+	sky = new EntityMesh();
+	sky->mesh = Mesh::Get("data/meshes/box.ASE");
+	sky->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+	sky->texture = Texture::Get("data/texture.tga");
+
 	parseScene(sceneFilename);
 }
 
 
+void World::renderSky() {
+	
+	sky->model.setTranslation(camera->eye);
+	glDisable(GL_DEPTH_TEST);
+	sky->render();
+	glEnable(GL_DEPTH_TEST);
+}
+
+
 void World::render() {
+
+	renderSky();
 
 	if (!freeCam) {
 
