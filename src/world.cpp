@@ -94,11 +94,13 @@ void World::updateCamera(double seconds_elapsed) {
 	}
 }
 
-bool World::checkPlayerCollision(const Vector3& target, std::vector<sCollisionData>* collisions) {
+bool World::checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* collisions) {
 	Vector3 col_point;
 	Vector3 col_normal;
 
-	float max_dist = 1.f;
+	// as the position of the player is on its feet, we add a height
+	float max_dist = 10.f;
+	target.y += max_dist;
 
 	for (auto& e : root->children){
 		EntityCollider* ec = dynamic_cast<EntityCollider*>(e);
@@ -111,7 +113,6 @@ bool World::checkPlayerCollision(const Vector3& target, std::vector<sCollisionDa
 				if (!ec->mesh->testRayCollision(model, target, Vector3(0, -1, 0), col_point, col_normal, max_dist)) continue;
 				// add colision to list
 				col_normal.normalize();
-				col_point.y += max_dist;
 				collisions->push_back({ col_point, col_normal });
 			}
 		}
@@ -119,7 +120,6 @@ bool World::checkPlayerCollision(const Vector3& target, std::vector<sCollisionDa
 			if (!ec->mesh->testRayCollision(ec->model, target, Vector3(0, -1, 0), col_point, col_normal, max_dist)) continue;
 			// add colision to list
 			col_normal.normalize();
-			col_point.y += max_dist;
 			collisions->push_back({ col_point, col_normal });
 		}	
 	}

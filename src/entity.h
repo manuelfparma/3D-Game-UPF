@@ -91,7 +91,7 @@ public:
 	float gravity_speed;
 	Vector3 velocity;
 	float velocity_decrease_factor;
-	bool isOnFloor;
+	//bool isOnFloor;
 
 
 	void update(float seconds_elapsed);

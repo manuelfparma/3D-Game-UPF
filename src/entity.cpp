@@ -98,7 +98,7 @@ EntityPlayer::EntityPlayer() : EntityCollider(true, CHARACTER) {
 	gravity_speed = 2.5f;
 	velocity = Vector3(0,0,0);
 	velocity_decrease_factor = 0.5;
-	isOnFloor = false;
+	//isOnFloor = false;
 
 	// Model
 	mesh = Mesh::Get("data/character.obj");
@@ -133,21 +133,15 @@ void EntityPlayer::update(float seconds_elapsed){
 	if (Input::isKeyPressed(SDL_SCANCODE_D)) move_dir = move_dir - move_right;
 	if (Input::isKeyPressed(SDL_SCANCODE_S)) move_dir = move_dir - move_front;
 	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT))  curSpeed *= 0.3;
-	if (isOnFloor && Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
-		// jumping
-		velocity.y += jump_speed;
-	}
 
 	if (move_dir.length() > 0.01) move_dir.normalize();
 	velocity += move_dir * curSpeed;
-
-	float floor_y = -9999.f;
 
 	std::vector<sCollisionData> collisions;
 	World* world = Game::instance->stageManager->currentStage->world;
 
 	// we suppose the player is on the air
-	isOnFloor = false;
+	bool isOnFloor = false;
 
 	// check collisions
 	if (world->checkPlayerCollision(position + velocity * seconds_elapsed, &collisions)) {
@@ -158,7 +152,6 @@ void EntityPlayer::update(float seconds_elapsed){
 			if (abs(up_factor) > 0.8) {
 				isOnFloor = true;
 				velocity.y = 0;
-				floor_y = collision.colPoint.y;
 			}
 
 			// TODO: wall collisions
@@ -168,11 +161,12 @@ void EntityPlayer::update(float seconds_elapsed){
 	if (!isOnFloor) {
 		// gravitational pull
 		velocity.y -= 2.5;
+	}else if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
+		// jumping
+		velocity.y += jump_speed;
 	}
 
 	position += velocity * seconds_elapsed;
-	// to stop the player from going through the floor
-	position.y = max(position.y, floor_y);
 	velocity.x *= 0.5;
 	velocity.z *= 0.5;
 
