@@ -149,7 +149,7 @@ void EntityPlayer::update(float seconds_elapsed){
 			// check for floor collisions
 			float up_factor = collision.colNormal.dot(Vector3(0, 1, 0));
 
-			if (abs(up_factor) > 0.8) {
+			if (up_factor > 0.8) {
 				isOnFloor = true;
 				velocity.y = 0;
 			}
