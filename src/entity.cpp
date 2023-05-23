@@ -141,8 +141,10 @@ void EntityPlayer::update(float seconds_elapsed){
 				isOnFloor = true;
 				velocity.y = 0;
 			}
-
-			// TODO: wall collisions
+			else {
+				Vector3 push = velocity.dot(collision.colNormal) * collision.colNormal;
+				velocity -= push;
+			}
 		}
 	}
 

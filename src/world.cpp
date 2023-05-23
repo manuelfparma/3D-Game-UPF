@@ -94,12 +94,29 @@ void World::updateCamera(double seconds_elapsed) {
 	}
 }
 
-bool World::checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* collisions) {
+static void checkFloorCollision(Mesh* mesh, Matrix44 model, Vector3 target, float max_dist, std::vector<sCollisionData>* collisions) {
 	Vector3 col_point;
 	Vector3 col_normal;
 
+	if (!mesh->testRayCollision(model, target, Vector3(0, -1, 0), col_point, col_normal, max_dist)) return;
+	// add colision to list
+	col_normal.normalize();
+	collisions->push_back({ col_point, col_normal });
+}
+
+static void checkWallCollision(Mesh* mesh, Matrix44 model, Vector3 target, std::vector<sCollisionData>* collisions) {
+	Vector3 col_point;
+	Vector3 col_normal;
+
+	if (!mesh->testSphereCollision(model, target, 2.f, col_point, col_normal)) return;
+	// add colision to list
+	col_normal.normalize();
+	collisions->push_back({ col_point, col_normal });
+}
+
+bool World::checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* collisions) {
 	// as the position of the player is on its feet, we add a height
-	float max_dist = 10.f;
+	float max_dist = player->model_height;
 	target.y += max_dist;
 
 	for (auto& e : root->children){
@@ -109,18 +126,13 @@ bool World::checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* co
 
 		if (ec->isInstanced) {
 			for (auto& model : ec->models) {
-				//TODO: CHANGE MAX DISTANCE
-				if (!ec->mesh->testRayCollision(model, target, Vector3(0, -1, 0), col_point, col_normal, max_dist)) continue;
-				// add colision to list
-				col_normal.normalize();
-				collisions->push_back({ col_point, col_normal });
+				checkFloorCollision(ec->mesh, model, target, max_dist, collisions);
+				checkWallCollision(ec->mesh, model, target, collisions);
 			}
 		}
 		else {
-			if (!ec->mesh->testRayCollision(ec->model, target, Vector3(0, -1, 0), col_point, col_normal, max_dist)) continue;
-			// add colision to list
-			col_normal.normalize();
-			collisions->push_back({ col_point, col_normal });
+			checkFloorCollision(ec->mesh, ec->model, target, max_dist, collisions);
+			checkWallCollision(ec->mesh, ec->model, target, collisions);
 		}	
 	}
 

@@ -96,6 +96,9 @@ public:
 	const float floor_friction = 0.001f;
 	Vector3 velocity = Vector3(0, 0, 0);
 
+	// Model
+	float model_height = 10.f;
+
 	void update(float seconds_elapsed);
 	EntityPlayer();
 };
