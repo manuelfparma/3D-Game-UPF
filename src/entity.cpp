@@ -85,20 +85,8 @@ EntityCollider::EntityCollider(bool isDynamic, int layer ) {
 }
 
 EntityPlayer::EntityPlayer() : EntityCollider(true, CHARACTER) {
-	model.setTranslation(Vector3(0, 5, 0));
-
-	// Rotation
-	yaw = 0.0f;
-	pitch = 0.0f;
-	roll = 0.0f;
-
-	// Movement
-	speed = 10.0f;
-	jump_speed = 300.0f;
-	gravity_speed = 2.5f;
-	velocity = Vector3(0,0,0);
-	velocity_decrease_factor = 0.5;
-	//isOnFloor = false;
+	// set initial position
+	model.setTranslation(initial_pos);
 
 	// Model
 	mesh = Mesh::Get("data/character.obj");
@@ -121,18 +109,18 @@ void EntityPlayer::update(float seconds_elapsed){
 	Vector3 center;
 	Vector3 position = model.getTranslation();
 
-	Vector3 move_dir;
+	Vector3 move_dir(0.f, 0.f, 0.f);
 
 	Vector3 move_right = mYaw.rightVector();
 	Vector3 move_front = mYaw.frontVector();
 
 	float curSpeed = speed;
 	//if (Input::isKeyPressed(SDL_SCANCODE_W)) 
-	if (Input::isKeyPressed(SDL_SCANCODE_W)) move_dir = move_dir + move_front;
-	if (Input::isKeyPressed(SDL_SCANCODE_A)) move_dir = move_dir + move_right;
-	if (Input::isKeyPressed(SDL_SCANCODE_D)) move_dir = move_dir - move_right;
-	if (Input::isKeyPressed(SDL_SCANCODE_S)) move_dir = move_dir - move_front;
-	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT))  curSpeed *= 0.3;
+	if (Input::isKeyPressed(SDL_SCANCODE_W)) move_dir += move_front;
+	if (Input::isKeyPressed(SDL_SCANCODE_A)) move_dir += move_right;
+	if (Input::isKeyPressed(SDL_SCANCODE_D)) move_dir -= move_right;
+	if (Input::isKeyPressed(SDL_SCANCODE_S)) move_dir -= move_front;
+	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT))  curSpeed *= crouch_factor;
 
 	if (move_dir.length() > 0.01) move_dir.normalize();
 	velocity += move_dir * curSpeed;
@@ -160,15 +148,16 @@ void EntityPlayer::update(float seconds_elapsed){
 
 	if (!isOnFloor) {
 		// gravitational pull
-		velocity.y -= 2.5;
+		velocity.y -= gravity_speed;
 	}else if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
 		// jumping
-		velocity.y += jump_speed;
+		velocity.y = jump_speed;
 	}
 
 	position += velocity * seconds_elapsed;
-	velocity.x *= 0.5;
-	velocity.z *= 0.5;
+	// floor friction
+	velocity.x *= pow(floor_friction, seconds_elapsed);
+	velocity.z *= pow(floor_friction, seconds_elapsed);
 
 	model.setTranslation(position);
 	model.rotate(yaw, Vector3(0, 1, 0));

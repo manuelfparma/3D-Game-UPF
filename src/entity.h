@@ -80,19 +80,21 @@ public:
 
 class EntityPlayer : public EntityCollider {
 public:
+	// Initial position
+	Vector3 initial_pos = Vector3(0.f, 5.f, 0.f);
+
 	// Rotation
-	float yaw;
-	float pitch;
-	float roll;
+	float yaw = 0.f;
+	float pitch = 0.f;
+	float roll = 0.f;
 
 	// Movement
-	float jump_speed;
-	float speed;
-	float gravity_speed;
-	Vector3 velocity;
-	float velocity_decrease_factor;
-	//bool isOnFloor;
-
+	const float speed = 1.0f;
+	const float crouch_factor = 0.3f;
+	const float jump_speed = 300.0f;
+	const float gravity_speed = 2.5f;
+	const float floor_friction = 0.001f;
+	Vector3 velocity = Vector3(0, 0, 0);
 
 	void update(float seconds_elapsed);
 	EntityPlayer();
