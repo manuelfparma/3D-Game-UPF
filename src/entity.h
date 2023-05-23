@@ -91,8 +91,8 @@ public:
 	// Movement
 	const float speed = 1.0f;
 	const float crouch_factor = 0.3f;
-	const float jump_speed = 300.0f;
-	const float gravity_speed = 2.5f;
+	const float jump_speed = 100.0f;
+	const float gravity_speed = 150.f;
 	const float floor_friction = 0.001f;
 	Vector3 velocity = Vector3(0, 0, 0);
 

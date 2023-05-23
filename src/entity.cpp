@@ -148,7 +148,7 @@ void EntityPlayer::update(float seconds_elapsed){
 
 	if (!isOnFloor) {
 		// gravitational pull
-		velocity.y -= gravity_speed;
+		velocity.y -= gravity_speed * seconds_elapsed;
 	}else if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
 		// jumping
 		velocity.y = jump_speed;
