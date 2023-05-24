@@ -61,7 +61,7 @@
     <ClCompile Include="..\..\src\animation.cpp">
       <Filter>gfx</Filter>
     </ClCompile>
-     <ClCompile Include="..\..\src\extra\pathfinder\AStar.cpp">
+    <ClCompile Include="..\..\src\extra\pathfinder\AStar.cpp">
       <Filter>extra\pathfinder</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\extra\pathfinder\Dijkstra.cpp">
@@ -131,7 +131,7 @@
     <ClInclude Include="..\..\src\animation.h">
       <Filter>gfx</Filter>
     </ClInclude>
-     <ClCompile Include="..\..\src\extra\pathfinder\AStar.cpp">
+    <ClCompile Include="..\..\src\extra\pathfinder\AStar.cpp">
       <Filter>extra\pathfinder</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\extra\pathfinder\Dijkstra.cpp">
@@ -143,6 +143,14 @@
     <ClInclude Include="..\..\src\entity.h" />
     <ClInclude Include="..\..\src\stage.h" />
     <ClInclude Include="..\..\src\world.h" />
+    <ClInclude Include="..\..\src\extra\pathfinder\AStar.h" />
+    <ClInclude Include="..\..\src\extra\pathfinder\Dijkstra.h" />
+    <ClInclude Include="..\..\src\extra\pathfinder\Node.h" />
+    <ClInclude Include="..\..\src\extra\pathfinder\PathAlgorithm.h" />
+    <ClInclude Include="..\..\src\extra\pathfinder\PathFinder.h" />
+    <ClInclude Include="..\..\src\extra\bass.h">
+      <Filter>extra</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="extra">
