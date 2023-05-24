@@ -24,8 +24,8 @@ World::World(const char* sceneFilename) {
 		"data/textures/skybox/left.png",
 		"data/textures/skybox/bottom.png",
 		"data/textures/skybox/top.png",
+		"data/textures/skybox/back.png",
 		"data/textures/skybox/front.png",
-		"data/textures/skybox/back.png"
 	};
 
 	Texture* skybox = new Texture();
@@ -34,8 +34,8 @@ World::World(const char* sceneFilename) {
 	
 	sky = new EntityMesh();
 	sky->mesh = Mesh::Get("data/meshes/box.ASE");
-	sky->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
-	sky->texture = Texture::Get("data/texture.tga");
+	sky->shader = Shader::Get("data/shaders/cube.vs", "data/shaders/cubemap.fs");
+	sky->texture = skybox;
 
 	parseScene(sceneFilename);
 }
