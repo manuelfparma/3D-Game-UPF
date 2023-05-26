@@ -89,8 +89,8 @@ EntityPlayer::EntityPlayer() : EntityCollider(true, CHARACTER) {
 	model.setTranslation(initial_pos);
 
 	// Model
-	mesh = Mesh::Get("data/character.obj");
-	shader = Shader::getDefaultShader("flat");
+	mesh = Mesh::Get("data/models/ninja.obj");
+	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/material.fs");
 }
 
 void EntityPlayer::update(float seconds_elapsed){
