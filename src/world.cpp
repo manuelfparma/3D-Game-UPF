@@ -94,8 +94,49 @@ void World::updateCamera(double seconds_elapsed) {
 	}
 }
 
-bool World::checkPlayerCollision(const Vector3& target, std::vector<sCollisionData>* collisions) {
-	return true;
+static void checkFloorCollision(Mesh* mesh, Matrix44 model, Vector3 target, float max_dist, std::vector<sCollisionData>* collisions) {
+	Vector3 col_point;
+	Vector3 col_normal;
+
+	if (!mesh->testRayCollision(model, target, Vector3(0, -1, 0), col_point, col_normal, max_dist)) return;
+	// add colision to list
+	col_normal.normalize();
+	collisions->push_back({ col_point, col_normal });
+}
+
+static void checkWallCollision(Mesh* mesh, Matrix44 model, Vector3 target, std::vector<sCollisionData>* collisions) {
+	Vector3 col_point;
+	Vector3 col_normal;
+
+	if (!mesh->testSphereCollision(model, target, 2.f, col_point, col_normal)) return;
+	// add colision to list
+	col_normal.normalize();
+	collisions->push_back({ col_point, col_normal });
+}
+
+bool World::checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* collisions) {
+	// as the position of the player is on its feet, we add a height
+	float max_dist = player->model_height;
+	target.y += max_dist;
+
+	for (auto& e : root->children){
+		EntityCollider* ec = dynamic_cast<EntityCollider*>(e);
+
+		if (!ec) continue;
+
+		if (ec->isInstanced) {
+			for (auto& model : ec->models) {
+				checkFloorCollision(ec->mesh, model, target, max_dist, collisions);
+				checkWallCollision(ec->mesh, model, target, collisions);
+			}
+		}
+		else {
+			checkFloorCollision(ec->mesh, ec->model, target, max_dist, collisions);
+			checkWallCollision(ec->mesh, ec->model, target, collisions);
+		}	
+	}
+
+	return !collisions->empty();
 }
 
 bool World::checkLineOfSight(Matrix44& obs, Matrix44& target) {
@@ -187,13 +228,13 @@ bool World::parseScene(const char* filename)
 		// Create instanced entity
 		if (render_data.models.size() > 1) {
 
-			EntityMesh* new_entity = new EntityMesh(Mesh::Get(mesh_name.c_str()), defaultTexture, instancedShader, true, render_data.models);
+			EntityCollider* new_entity = new EntityCollider(Mesh::Get(mesh_name.c_str()), defaultTexture, instancedShader, render_data.models);
 			// Add entity to scene root
-			root->addChild((Entity *)new_entity);
+			root->addChild(new_entity);
 		}
 		// Create normal entity
 		else {
-			EntityMesh* new_entity = new EntityMesh(Mesh::Get(mesh_name.c_str()), defaultTexture, singleShader);
+			EntityCollider* new_entity = new EntityCollider(Mesh::Get(mesh_name.c_str()), defaultTexture, singleShader);
 			new_entity->model = render_data.models[0];
 			// Add entity to scene root
 			root->addChild(new_entity);

@@ -1,6 +1,10 @@
 #include "entity.h"
 #include "camera.h"
 #include "input.h"
+#include "world.h"
+#include "game.h"
+#include "stage.h"
+#include <iostream>
 
 Matrix44 Entity::getGlobalMatrix()
 {
@@ -66,11 +70,11 @@ EntityMesh::EntityMesh(Mesh* mesh, Texture* texture, Shader* shader) : Entity() 
 	this->shader = shader;
 }
 
-EntityMesh::EntityMesh(Mesh* mesh, Texture* texture, Shader* shader, bool isInstanced, std::vector<Matrix44> models) : Entity() {
+EntityMesh::EntityMesh(Mesh* mesh, Texture* texture, Shader* shader, std::vector<Matrix44> models) : Entity() {
 	this->mesh = mesh;
 	this->texture = texture;
 	this->shader = shader;
-	this->isInstanced = isInstanced;
+	this->isInstanced = true;
 	this->models = models;
 }
 
@@ -81,19 +85,8 @@ EntityCollider::EntityCollider(bool isDynamic, int layer ) {
 }
 
 EntityPlayer::EntityPlayer() : EntityCollider(true, CHARACTER) {
-
-	// Rotation
-	yaw = 0.0f;
-	pitch = 0.0f;
-	roll = 0.0f;
-
-	// Movement
-	speed = 10.0f;
-	jump_speed = 300.0f;
-	gravity_speed = 2.5f;
-	velocity = Vector3(0,0,0);
-	velocity_decrease_factor = 0.5;
-	isOnFloor = true;
+	// set initial position
+	model.setTranslation(initial_pos);
 
 	// Model
 	mesh = Mesh::Get("data/character.obj");
@@ -101,7 +94,6 @@ EntityPlayer::EntityPlayer() : EntityCollider(true, CHARACTER) {
 }
 
 void EntityPlayer::update(float seconds_elapsed){
-	
 	yaw -= Input::mouse_delta.x * seconds_elapsed * 10.f * DEG2RAD;
 	pitch -= Input::mouse_delta.y * seconds_elapsed * 10.f * DEG2RAD;
 	pitch = clamp(pitch, -M_PI * 0.3f, M_PI * 0.3f);
@@ -117,36 +109,58 @@ void EntityPlayer::update(float seconds_elapsed){
 	Vector3 center;
 	Vector3 position = model.getTranslation();
 
-	Vector3 move_dir;
+	Vector3 move_dir(0.f, 0.f, 0.f);
 
 	Vector3 move_right = mYaw.rightVector();
 	Vector3 move_front = mYaw.frontVector();
 
 	float curSpeed = speed;
 	//if (Input::isKeyPressed(SDL_SCANCODE_W)) 
-	if (Input::isKeyPressed(SDL_SCANCODE_W)) move_dir = move_dir + move_front;
-	if (Input::isKeyPressed(SDL_SCANCODE_A)) move_dir = move_dir + move_right;
-	if (Input::isKeyPressed(SDL_SCANCODE_D)) move_dir = move_dir - move_right;
-	if (Input::isKeyPressed(SDL_SCANCODE_S)) move_dir = move_dir - move_front;
-	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT))  curSpeed *= 0.3;
-
-	if (!isOnFloor) {
-		velocity.y -= 2.5;
-	}
-	else {
-		if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
-			velocity.y += jump_speed;
-			isOnFloor = false;
-		}
-	}
+	if (Input::isKeyPressed(SDL_SCANCODE_W)) move_dir += move_front;
+	if (Input::isKeyPressed(SDL_SCANCODE_A)) move_dir += move_right;
+	if (Input::isKeyPressed(SDL_SCANCODE_D)) move_dir -= move_right;
+	if (Input::isKeyPressed(SDL_SCANCODE_S)) move_dir -= move_front;
+	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT))  curSpeed *= crouch_factor;
 
 	if (move_dir.length() > 0.01) move_dir.normalize();
 	velocity += move_dir * curSpeed;
-	
-	position += velocity * seconds_elapsed;
 
-	velocity.x *= 0.5;
-	velocity.z *= 0.5;
+	std::vector<sCollisionData> collisions;
+	World* world = Game::instance->stageManager->currentStage->world;
+
+	// we suppose the player is on the air
+	bool isOnFloor = false;
+
+	// check collisions
+	if (world->checkPlayerCollision(position + velocity * seconds_elapsed, &collisions)) {
+		for (const sCollisionData& collision : collisions) {
+			// check for floor collisions
+			float up_factor = collision.colNormal.dot(Vector3(0, 1, 0));
+
+			if (up_factor > 0.8) {
+				isOnFloor = true;
+				velocity.y = 0;
+			}
+			else {
+				Vector3 push = velocity.dot(collision.colNormal) * collision.colNormal;
+				velocity -= push;
+			}
+		}
+	}
+
+	if (!isOnFloor) {
+		// gravitational pull
+		velocity.y -= gravity_speed * seconds_elapsed;
+	}else if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
+		// jumping
+		velocity.y = jump_speed;
+	}
+
+	position += velocity * seconds_elapsed;
+	// floor friction
+	velocity.x *= pow(floor_friction, seconds_elapsed);
+	velocity.z *= pow(floor_friction, seconds_elapsed);
+
 	model.setTranslation(position);
 	model.rotate(yaw, Vector3(0, 1, 0));
 }
