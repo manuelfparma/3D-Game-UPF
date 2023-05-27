@@ -1,7 +1,7 @@
 # Blender v3.5.1 OBJ File: 'Scene.blend'
 # www.blender.org
-mtllib Cube.001.mtl
-o Wall.007_Cube.001
+mtllib WallMesh.mtl
+o Wall.007_WallMesh
 v -96.951004 -20.588316 6.446991
 v -96.951004 20.588316 6.446991
 v -96.951004 -20.588316 -6.446991
