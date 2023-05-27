@@ -36,22 +36,43 @@ void Entity::render()
 	}
 }
 
+bool checkRender(Matrix44 model, Mesh *mesh) {
+	Camera* camera = Camera::current;
+
+	// Compute bounding sphere center 
+	// in world coords
+	Vector3 sphere_center = model * mesh->box.center;
+	float sphere_radius = mesh->radius;
+
+	// ignore objects whose bounding sphere 
+	// is not inside the camera frustum
+	if (camera->testSphereInFrustum(sphere_center, sphere_radius) == false)
+		return false;
+
+	return true;
+}
+
 void EntityMesh::render()
 {
 	// Get the last camera that was activated 
 	Camera* camera = Camera::current;
 	
 	// Enable shader and pass uniforms 
-
 	shader->enable();	
 	shader->setUniform("u_color", color);
 	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
 	if (texture) shader->setTexture("u_texture", texture, 0);
 	
 	if (isInstanced) {
-		mesh->renderInstanced(GL_TRIANGLES, models.data(), models.size());
+		// we will check which models to render
+		std::vector<Matrix44> render_models;
+		for (auto& model : models)
+			if (checkRender(model, mesh))
+				render_models.push_back(model);
+		mesh->renderInstanced(GL_TRIANGLES, render_models.data(), render_models.size());
 	}
-	else {
+	// only render instance if inside fustrum
+	else if (checkRender(model, mesh)){
 		shader->setUniform("u_model", getGlobalMatrix());
 		mesh->render(GL_TRIANGLES);
 	}
@@ -79,18 +100,27 @@ EntityMesh::EntityMesh(Mesh* mesh, Texture* texture, Shader* shader, std::vector
 }
 
 
-EntityCollider::EntityCollider(bool isDynamic, int layer ) {
+EntityCollider::EntityCollider(bool isDynamic, COLISSION_LAYER layer ) {
 	isDynamic = isDynamic;
 	layer = layer;
 }
 
-EntityPlayer::EntityPlayer() : EntityCollider(true, CHARACTER) {
+EntityPlayer::EntityPlayer() : EntityCollider(true, PLAYER) {
 	// set initial position
 	model.setTranslation(initial_pos);
 
 	// Model
 	mesh = Mesh::Get("data/models/ninja.obj");
 	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/material.fs");
+	color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+}
+
+EntityArmy::EntityArmy(Mesh* mesh, Texture* texture, Shader* shader, std::vector<Matrix44> models)
+	: EntityCollider(mesh, texture, shader, models)
+{
+	isDynamic = true;
+	layer = ENEMY;
+	color = SEARCH_COLOR;
 }
 
 
@@ -196,11 +226,20 @@ void EntityPlayer::update(float seconds_elapsed){
 
 }
 
+void EntityArmy::update(float seconds_elapsed) {
+	World *world = Game::instance->stageManager->currentStage->world;
+	Matrix44 player = world->player->getGlobalMatrix();
+	
+	color = SEARCH_COLOR;
 
-bool EntityCollider::testCollision(EntityCollider* other) {
-	return false;
-}
+	for (int i = 0; i < models.size(); ++i){
+		Matrix44* mModel = &models[i];
+				
+		mModel->translate(0, 0, move_speed * seconds_elapsed);
 
-bool EntityCollider::testCollision(std::vector<EntityCollider*> vector) {
-	return false;
+		if (world->checkLineOfSight(*mModel, player)) {
+			color = FOUND_COLOR;
+			break;
+		}
+	}
 }

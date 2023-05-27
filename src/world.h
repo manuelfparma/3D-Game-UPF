@@ -25,7 +25,11 @@ public:
 	Entity* root;
 	EntityMesh* sky;
 	EntityPlayer* player;
+	EntityArmy* enemies;
 	std::map<std::string, sRenderData> meshes_to_load;
+
+	// stats
+	int ENEMY_COUNT = 4;
 
 	World(const char* sceneFilename);
 	bool parseScene(const char* filename);
@@ -37,6 +41,8 @@ public:
 	void checkCameraCollision(Vector3& target);
 	bool checkLineOfSight(Matrix44& obs, Matrix44& target);
 private:
+	void createSkybox();
+	void createEnemies();
 	void collisionCalculations(Mesh* mesh, Matrix44 model, Vector3 target, std::vector<sCollisionData>* collisions);
 };
 
