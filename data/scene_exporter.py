@@ -9,7 +9,7 @@ folderpath = bpy.path.abspath("//") + "meshes/"
 # Deselect all objects
 bpy.ops.object.select_all(action='DESELECT')
 
-export_scale = 1.0
+export_scale = 2.0
 
 with open(filepath, 'w') as f:
     

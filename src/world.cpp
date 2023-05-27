@@ -78,6 +78,8 @@ void World::render() {
 			center = player->getGlobalMatrix() * Vector3(0, player->model_height, 0.5f);
 		}
 
+		checkCameraCollision(eye);
+
 		camera->lookAt(eye, center, Vector3(0, 1, 0));
 	}
 
@@ -164,6 +166,36 @@ bool World::checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* co
 	}
 
 	return !collisions->empty();
+}
+
+void World::checkCameraCollision(Vector3& target) {
+	Vector3 origin = player->getGlobalMatrix() * Vector3(0.f, player->model_height, 0);
+	Vector3 toTarget = target - origin;
+	Vector3 collision;
+	float distance = toTarget.length();
+	
+	Vector3 direction =  toTarget.length() > 0.01 ? toTarget.normalize() : toTarget;
+
+	for (auto& e : root->children) {
+		EntityCollider* ec = dynamic_cast<EntityCollider*>(e);
+
+		if (!ec) continue;
+
+		if (ec->isInstanced) {
+			for (auto& model : ec->models) {
+				if (ec->mesh->testRayCollision(model, origin, direction, collision, Vector3(), distance)) {
+					target = collision;
+					distance = (target - origin).length();
+				}
+			}
+		}
+		else {
+			if (ec->mesh->testRayCollision(ec->model, origin, normalize(toTarget), collision, Vector3(), distance)) {
+				target = collision;
+				distance = (target - origin).length();
+			};
+		}
+	}
 }
 
 bool World::checkLineOfSight(Matrix44& obs, Matrix44& target) {
