@@ -35,6 +35,7 @@ public:
 	void updateCamera(double seconds_elapsed);
 	bool checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* collisions);
 	bool checkLineOfSight(Matrix44& obs, Matrix44& target);
-	
+private:
+	void collisionCalculations(Mesh* mesh, Matrix44 model, Vector3 target, std::vector<sCollisionData>* collisions);
 };
 

@@ -17,8 +17,11 @@ World::World(const char* sceneFilename) {
     camera->lookAt(Vector3(0.f, 100.f, 100.f), Vector3(0.f, 0.f, 0.f), Vector3(0.f, 1.f, 0.f)); //position the camera and point to 0,0,0
     camera->setPerspective(70.f, Game::instance->window_width / (float)Game::instance->window_height, 0.1f, 10000.f); //set the projection, we want to be perspective
 
+	// initialize root and player
     root = new Entity();
     player = new EntityPlayer();
+
+	// create skybox
 	std::vector<std::string> faces = {
 		"data/textures/skybox/right.png",
 		"data/textures/skybox/left.png",
@@ -67,12 +70,12 @@ void World::render() {
 		Vector3 center;
 
 		if (firstPerson) {
-			eye = player->getGlobalMatrix() * Vector3(0.f, 2.f, 0.5f);
+			eye = player->getGlobalMatrix() * Vector3(0.f, player->model_height, 0.5f);
 			center = eye + front;
 		}
 		else {
 			eye = player->model.getTranslation() - front * 10.0f;
-			center = player->getGlobalMatrix() * Vector3(0, 2.0f, 0.5f);
+			center = player->getGlobalMatrix() * Vector3(0, player->model_height, 0.5f);
 		}
 
 		camera->lookAt(eye, center, Vector3(0, 1, 0));
@@ -109,7 +112,7 @@ void World::update(double seconds_elapsed) {
 
 void World::updateCamera(double seconds_elapsed) {
 
-	float speed = 1.f;
+	float speed = 10.f * seconds_elapsed;
 	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT)) speed *= 10; //move faster with left shift
 	if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) camera->move(Vector3(0.0f, 0.0f, 1.0f) * speed);
 	if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) camera->move(Vector3(0.0f, 0.0f, -1.0f) * speed);
@@ -123,31 +126,28 @@ void World::updateCamera(double seconds_elapsed) {
 	}
 }
 
-static void checkFloorCollision(Mesh* mesh, Matrix44 model, Vector3 target, float max_dist, std::vector<sCollisionData>* collisions) {
+void World::collisionCalculations(Mesh* mesh, Matrix44 model, Vector3 target, std::vector<sCollisionData>* collisions) {
 	Vector3 col_point;
 	Vector3 col_normal;
 
+	// as the position of the player is on its feet, we add a height
+	float max_dist = player->model_height / 2;
+	target.y += max_dist;
+
+	// wall colision
+	if (!mesh->testSphereCollision(model, target, max_dist, col_point, col_normal)) return;
+	// add colision to list
+	col_normal.normalize();
+	collisions->push_back({ col_point, col_normal });
+
+	// floor collision
 	if (!mesh->testRayCollision(model, target, Vector3(0, -1, 0), col_point, col_normal, max_dist)) return;
 	// add colision to list
 	col_normal.normalize();
 	collisions->push_back({ col_point, col_normal });
 }
 
-static void checkWallCollision(Mesh* mesh, Matrix44 model, Vector3 target, std::vector<sCollisionData>* collisions) {
-	Vector3 col_point;
-	Vector3 col_normal;
-
-	if (!mesh->testSphereCollision(model, target, 2.f, col_point, col_normal)) return;
-	// add colision to list
-	col_normal.normalize();
-	collisions->push_back({ col_point, col_normal });
-}
-
 bool World::checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* collisions) {
-	// as the position of the player is on its feet, we add a height
-	float max_dist = player->model_height;
-	target.y += max_dist;
-
 	for (auto& e : root->children){
 		EntityCollider* ec = dynamic_cast<EntityCollider*>(e);
 
@@ -155,13 +155,11 @@ bool World::checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* co
 
 		if (ec->isInstanced) {
 			for (auto& model : ec->models) {
-				checkFloorCollision(ec->mesh, model, target, max_dist, collisions);
-				checkWallCollision(ec->mesh, model, target, collisions);
+				collisionCalculations(ec->mesh, model, target, collisions);
 			}
 		}
 		else {
-			checkFloorCollision(ec->mesh, ec->model, target, max_dist, collisions);
-			checkWallCollision(ec->mesh, ec->model, target, collisions);
+			collisionCalculations(ec->mesh, ec->model, target, collisions);
 		}	
 	}
 

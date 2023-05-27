@@ -105,8 +105,6 @@ void EntityPlayer::update(float seconds_elapsed){
 	mPitch.setRotation(pitch, Vector3(-1, 0, 0));
 
 	Vector3 front = (mPitch * mYaw).frontVector();
-	Vector3 eye;
-	Vector3 center;
 	Vector3 position = model.getTranslation();
 
 	Vector3 move_dir(0.f, 0.f, 0.f);
@@ -114,13 +112,17 @@ void EntityPlayer::update(float seconds_elapsed){
 	Vector3 move_right = mYaw.rightVector();
 	Vector3 move_front = mYaw.frontVector();
 
+	bool moving = false;
+
 	float curSpeed = speed;
-	//if (Input::isKeyPressed(SDL_SCANCODE_W)) 
 	if (Input::isKeyPressed(SDL_SCANCODE_W)) move_dir += move_front;
 	if (Input::isKeyPressed(SDL_SCANCODE_A)) move_dir += move_right;
 	if (Input::isKeyPressed(SDL_SCANCODE_D)) move_dir -= move_right;
 	if (Input::isKeyPressed(SDL_SCANCODE_S)) move_dir -= move_front;
 	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT))  curSpeed *= crouch_factor;
+
+	if (move_dir.x != 0 || move_dir.y != 0 || move_dir.z != 0)
+		moving = true;
 
 	if (move_dir.length() > 0.01) move_dir.normalize();
 	velocity += move_dir * curSpeed;
@@ -162,7 +164,9 @@ void EntityPlayer::update(float seconds_elapsed){
 	velocity.z *= pow(floor_friction, seconds_elapsed);
 
 	model.setTranslation(position);
-	model.rotate(yaw, Vector3(0, 1, 0));
+	if (moving || world->firstPerson)
+		lastYaw = yaw;
+	model.rotate(lastYaw, Vector3(0, 1, 0));
 }
 
 

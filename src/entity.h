@@ -87,6 +87,7 @@ public:
 	float yaw = 0.f;
 	float pitch = 0.f;
 	float roll = 0.f;
+	float lastYaw = 0.f;
 
 	// Movement
 	const float speed = 1.0f;
@@ -97,7 +98,7 @@ public:
 	Vector3 velocity = Vector3(0, 0, 0);
 
 	// Model
-	float model_height = 10.f;
+	float model_height = 5.f;
 
 	void update(float seconds_elapsed);
 	EntityPlayer();
