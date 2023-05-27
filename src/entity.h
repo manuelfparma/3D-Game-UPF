@@ -93,13 +93,20 @@ public:
 	const float speed = 1.0f;
 	const float crouch_factor = 0.3f;
 	const float jump_speed = 100.0f;
+	const int max_dashes = 1;
+	const float dash_speed = 200.0f;
 	const float gravity_speed = 150.f;
 	const float floor_friction = 0.001f;
+	
+	
+	// bool isOnFloor = false;
+	int dashes = 1;
 	Vector3 velocity = Vector3(0, 0, 0);
 
 	// Model
 	float model_height = 5.f;
 
+	void onTouchFloor();
 	void update(float seconds_elapsed);
 	EntityPlayer();
 };

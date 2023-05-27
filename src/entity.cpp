@@ -93,6 +93,12 @@ EntityPlayer::EntityPlayer() : EntityCollider(true, CHARACTER) {
 	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/material.fs");
 }
 
+
+void EntityPlayer::onTouchFloor() {
+	dashes = max_dashes;
+}
+
+
 void EntityPlayer::update(float seconds_elapsed){
 	yaw -= Input::mouse_delta.x * seconds_elapsed * 10.f * DEG2RAD;
 	pitch -= Input::mouse_delta.y * seconds_elapsed * 10.f * DEG2RAD;
@@ -131,7 +137,17 @@ void EntityPlayer::update(float seconds_elapsed){
 	World* world = Game::instance->stageManager->currentStage->world;
 
 	// we suppose the player is on the air
-	bool isOnFloor = false;
+
+	if (Input::wasKeyPressed(SDL_SCANCODE_Q)) {
+		
+		if (dashes){
+			velocity += move_front * dash_speed;
+			dashes-=1;
+		}
+		
+	}
+
+	bool onFloor = false;
 
 	// check collisions
 	if (world->checkPlayerCollision(position + velocity * seconds_elapsed, &collisions)) {
@@ -140,8 +156,16 @@ void EntityPlayer::update(float seconds_elapsed){
 			float up_factor = collision.colNormal.dot(Vector3(0, 1, 0));
 
 			if (up_factor > 0.8) {
-				isOnFloor = true;
+				
+				onFloor = true;
+				dashes = max_dashes;
+
+				/* if (!isOnFloor) {
+					onTouchFloor();
+				}; */
+
 				velocity.y = 0;
+
 			}
 			else {
 				Vector3 push = velocity.dot(collision.colNormal) * collision.colNormal;
@@ -150,13 +174,14 @@ void EntityPlayer::update(float seconds_elapsed){
 		}
 	}
 
-	if (!isOnFloor) {
+	if (!onFloor) {
 		// gravitational pull
 		velocity.y -= gravity_speed * seconds_elapsed;
 	}else if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
 		// jumping
 		velocity.y = jump_speed;
 	}
+
 
 	position += velocity * seconds_elapsed;
 	// floor friction
@@ -167,6 +192,8 @@ void EntityPlayer::update(float seconds_elapsed){
 	if (moving || world->firstPerson)
 		lastYaw = yaw;
 	model.rotate(lastYaw, Vector3(0, 1, 0));
+	// isOnFloor = onFloor;
+
 }
 
 
