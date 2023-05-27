@@ -49,21 +49,21 @@ void World::createSkybox() {
 
 void World::createEnemies() {
 	std::vector<Matrix44> models;
+	std::vector<float> yaws;
 	Matrix44 pos;
 
-	for (int i = 1; i <= enemy_count; ++i) {
+	for (int i = 1; i <= ENEMY_COUNT; ++i) {
 		pos.setTranslation(Vector3(5.f * i, 0.2f, 0.f));
+		pos.rotate(DEG2RAD * (360 / ENEMY_COUNT) * (i % ENEMY_COUNT), Vector3(0, 1, 0));
 		models.push_back(pos);
 	}
 
-	EntityMesh* enemy = new EntityMesh(
+	enemies = new EntityArmy(
 		Mesh::Get("data/models/samurai.obj"),
 		nullptr,
 		Shader::Get("data/shaders/instanced.vs", "data/shaders/material.fs"),
 		models
 	);
-
-	root->addChild(enemy);
 }
 
 void World::renderSky() {
@@ -107,13 +107,15 @@ void World::render() {
 
 	if (freeCam || !firstPerson)
 		player->render();
+
+	enemies->render();
 }
 
 void World::update(double seconds_elapsed) {
-
-
+	// pause the game if free camera is activated
 	if (!freeCam) {
 		player->update(seconds_elapsed);
+		enemies->update(seconds_elapsed);
 	}
 	else {
 		updateCamera(seconds_elapsed);
@@ -175,7 +177,7 @@ bool World::checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* co
 	for (auto& e : root->children){
 		EntityCollider* ec = dynamic_cast<EntityCollider*>(e);
 
-		if (!ec) continue;
+		if (!ec || ec->isDynamic) continue;
 
 		if (ec->isInstanced) {
 			for (auto& model : ec->models) {
@@ -196,25 +198,28 @@ bool World::checkLineOfSight(Matrix44& obs, Matrix44& target) {
 
 	float distance = toTarget.length();
 
-	Vector3 rayOrigin;
+	Vector3 rayOrigin = obs.getTranslation();
 	Vector3 direction = normalize(toTarget);
 
-	if (toTarget.dot(front) > 0.5)
+	if (direction.dot(front) > 0.5)
 	{
 		for (auto e : root->children)
 		{
 			EntityCollider* ec = dynamic_cast<EntityCollider*>(e);
 
-			if (!ec) continue;
+			if (!ec || ec->isDynamic) continue;
 
-			if (ec->mesh->testRayCollision(
-				ec->model,
-				rayOrigin,
-				direction,
-				Vector3(),
-				Vector3(),
-				distance
-			)) return false;
+			Vector3 point;
+
+			if (ec->isInstanced) {
+				// instanced entity
+				for (auto model : ec->models)
+					if (ec->mesh->testRayCollision(model, rayOrigin, direction, Vector3(), Vector3(), distance))
+						return false;
+			}
+			// not instanced entity
+			else if (ec->mesh->testRayCollision(ec->model, rayOrigin, direction, Vector3(), Vector3(), distance))
+				return false;
 		}
 
 		return true;

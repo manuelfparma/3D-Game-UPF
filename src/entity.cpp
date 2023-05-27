@@ -100,18 +100,27 @@ EntityMesh::EntityMesh(Mesh* mesh, Texture* texture, Shader* shader, std::vector
 }
 
 
-EntityCollider::EntityCollider(bool isDynamic, int layer ) {
+EntityCollider::EntityCollider(bool isDynamic, COLISSION_LAYER layer ) {
 	isDynamic = isDynamic;
 	layer = layer;
 }
 
-EntityPlayer::EntityPlayer() : EntityCollider(true, CHARACTER) {
+EntityPlayer::EntityPlayer() : EntityCollider(true, PLAYER) {
 	// set initial position
 	model.setTranslation(initial_pos);
 
 	// Model
 	mesh = Mesh::Get("data/models/ninja.obj");
 	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/material.fs");
+	color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+}
+
+EntityArmy::EntityArmy(Mesh* mesh, Texture* texture, Shader* shader, std::vector<Matrix44> models)
+	: EntityCollider(mesh, texture, shader, models)
+{
+	isDynamic = true;
+	layer = ENEMY;
+	color = SEARCH_COLOR;
 }
 
 void EntityPlayer::update(float seconds_elapsed){
@@ -190,11 +199,20 @@ void EntityPlayer::update(float seconds_elapsed){
 	model.rotate(lastYaw, Vector3(0, 1, 0));
 }
 
+void EntityArmy::update(float seconds_elapsed) {
+	World *world = Game::instance->stageManager->currentStage->world;
+	Matrix44 player = world->player->getGlobalMatrix();
+	
+	color = SEARCH_COLOR;
 
-bool EntityCollider::testCollision(EntityCollider* other) {
-	return false;
-}
+	for (int i = 0; i < models.size(); ++i){
+		Matrix44* mModel = &models[i];
+				
+		mModel->translate(0, 0, move_speed * seconds_elapsed);
 
-bool EntityCollider::testCollision(std::vector<EntityCollider*> vector) {
-	return false;
+		if (world->checkLineOfSight(*mModel, player)) {
+			color = FOUND_COLOR;
+			break;
+		}
+	}
 }

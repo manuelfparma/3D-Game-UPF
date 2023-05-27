@@ -48,34 +48,24 @@ public:
 	EntityMesh(Mesh* mesh, Texture* texture, Shader* shader, std::vector<Matrix44> models);
 };
 
-enum {
+typedef enum {
 	NONE = 0,
-	CHARACTER,
-	WALL,
-	FLOOR,
+	PLAYER = 1 << 0,
+	WALL = 1 << 1,
+	FLOOR = 1 << 2,
+	ENEMY = 1 << 3,
 	SCENARIO = WALL | FLOOR,
+	CHARACTER = PLAYER | ENEMY,
 	ALL = CHARACTER | SCENARIO
-};
+} COLISSION_LAYER;
 
 class EntityCollider : public EntityMesh {
 public:
 	bool isDynamic = false;
-	int layer = NONE;
-	bool testCollision(EntityCollider* entity);
-	bool testCollision(std::vector<EntityCollider*> entity);
-
-
-	//sphereRadius, etc
-	// void get COllisions
-
-	/*
-
-	if ( entity->layer & SCENARIO ) {}
-
-	*/
+	COLISSION_LAYER layer = NONE;
 
 	using EntityMesh::EntityMesh;
-	EntityCollider(bool isDynamic, int layer);
+	EntityCollider(bool isDynamic, COLISSION_LAYER layer);
 };
 
 class EntityPlayer : public EntityCollider {
@@ -102,4 +92,16 @@ public:
 
 	void update(float seconds_elapsed);
 	EntityPlayer();
+};
+
+class EntityArmy : public EntityCollider {
+public:
+	void update(float seconds_elapsed);
+
+	EntityArmy(Mesh* mesh, Texture* texture, Shader* shader, std::vector<Matrix44> models);
+private:
+	// constants
+	Vector4 SEARCH_COLOR = Vector4(0.f, 0.f, 0.5f, 1.f);
+	Vector4 FOUND_COLOR = Vector4(0.5f, 0.f, 0.f, 1.f);
+	float move_speed = 1.f;
 };

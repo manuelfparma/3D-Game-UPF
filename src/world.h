@@ -25,10 +25,11 @@ public:
 	Entity* root;
 	EntityMesh* sky;
 	EntityPlayer* player;
+	EntityArmy* enemies;
 	std::map<std::string, sRenderData> meshes_to_load;
 
 	// stats
-	int enemy_count = 5;
+	int ENEMY_COUNT = 4;
 
 	World(const char* sceneFilename);
 	bool parseScene(const char* filename);
