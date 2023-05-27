@@ -36,22 +36,43 @@ void Entity::render()
 	}
 }
 
+bool checkRender(Matrix44 model, Mesh *mesh) {
+	Camera* camera = Camera::current;
+
+	// Compute bounding sphere center 
+	// in world coords
+	Vector3 sphere_center = model * mesh->box.center;
+	float sphere_radius = mesh->radius;
+
+	// ignore objects whose bounding sphere 
+	// is not inside the camera frustum
+	if (camera->testSphereInFrustum(sphere_center, sphere_radius) == false)
+		return false;
+
+	return true;
+}
+
 void EntityMesh::render()
 {
 	// Get the last camera that was activated 
 	Camera* camera = Camera::current;
 	
 	// Enable shader and pass uniforms 
-
 	shader->enable();	
 	shader->setUniform("u_color", color);
 	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
 	if (texture) shader->setTexture("u_texture", texture, 0);
 	
 	if (isInstanced) {
-		mesh->renderInstanced(GL_TRIANGLES, models.data(), models.size());
+		// we will check which models to render
+		std::vector<Matrix44> render_models;
+		for (auto& model : models)
+			if (checkRender(model, mesh))
+				render_models.push_back(model);
+		mesh->renderInstanced(GL_TRIANGLES, render_models.data(), render_models.size());
 	}
-	else {
+	// only render instance if inside fustrum
+	else if (checkRender(model, mesh)){
 		shader->setUniform("u_model", getGlobalMatrix());
 		mesh->render(GL_TRIANGLES);
 	}

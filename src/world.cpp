@@ -104,7 +104,9 @@ void World::render() {
 	}
 
     root->render(); 
-	player->render();
+
+	if (freeCam || !firstPerson)
+		player->render();
 }
 
 void World::update(double seconds_elapsed) {
