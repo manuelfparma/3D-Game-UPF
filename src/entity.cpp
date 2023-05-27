@@ -100,7 +100,7 @@ EntityMesh::EntityMesh(Mesh* mesh, Texture* texture, Shader* shader, std::vector
 }
 
 
-EntityCollider::EntityCollider(bool isDynamic, COLISSION_LAYER layer ) {
+EntityCollider::EntityCollider(bool isDynamic, COLISSION_LAYER layer) {
 	isDynamic = isDynamic;
 	layer = layer;
 }
@@ -228,7 +228,7 @@ void EntityPlayer::update(float seconds_elapsed){
 
 void EntityArmy::update(float seconds_elapsed) {
 	World *world = Game::instance->stageManager->currentStage->world;
-	Matrix44 player = world->player->getGlobalMatrix();
+	Matrix44 player = world->player->model;
 	
 	color = SEARCH_COLOR;
 
@@ -237,6 +237,7 @@ void EntityArmy::update(float seconds_elapsed) {
 				
 		mModel->translate(0, 0, move_speed * seconds_elapsed);
 
+		// check if we can see the player
 		if (world->checkLineOfSight(*mModel, player)) {
 			color = FOUND_COLOR;
 			break;

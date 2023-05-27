@@ -230,7 +230,11 @@ bool World::checkLineOfSight(Matrix44& obs, Matrix44& target) {
 
 	float distance = toTarget.length();
 
+	if (distance > MAX_VIEW_DISTANCE)
+		return false;
+
 	Vector3 rayOrigin = obs.getTranslation();
+	rayOrigin.y += player->model_height;
 	Vector3 direction = normalize(toTarget);
 
 	if (direction.dot(front) > 0.5)
@@ -240,8 +244,6 @@ bool World::checkLineOfSight(Matrix44& obs, Matrix44& target) {
 			EntityCollider* ec = dynamic_cast<EntityCollider*>(e);
 
 			if (!ec || ec->isDynamic) continue;
-
-			Vector3 point;
 
 			if (ec->isInstanced) {
 				// instanced entity

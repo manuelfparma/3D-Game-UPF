@@ -30,6 +30,7 @@ public:
 
 	// stats
 	int ENEMY_COUNT = 4;
+	float MAX_VIEW_DISTANCE = 50.f;
 
 	World(const char* sceneFilename);
 	bool parseScene(const char* filename);
