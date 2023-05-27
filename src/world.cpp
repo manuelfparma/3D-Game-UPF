@@ -21,7 +21,14 @@ World::World(const char* sceneFilename) {
     root = new Entity();
     player = new EntityPlayer();
 
-	// create skybox
+	createSkybox();
+	createEnemies();
+
+	// open scene
+	parseScene(sceneFilename);
+}
+
+void World::createSkybox() {
 	std::vector<std::string> faces = {
 		"data/textures/skybox/right.png",
 		"data/textures/skybox/left.png",
@@ -33,16 +40,31 @@ World::World(const char* sceneFilename) {
 
 	Texture* skybox = new Texture();
 	skybox->loadCubemap("sky", faces);
-	
-	
+
 	sky = new EntityMesh();
 	sky->mesh = Mesh::Get("data/meshes/box.ASE");
 	sky->shader = Shader::Get("data/shaders/cube.vs", "data/shaders/cubemap.fs");
 	sky->texture = skybox;
-
-	parseScene(sceneFilename);
 }
 
+void World::createEnemies() {
+	std::vector<Matrix44> models;
+	Matrix44 pos;
+
+	for (int i = 1; i <= enemy_count; ++i) {
+		pos.setTranslation(Vector3(5.f * i, 0.2f, 0.f));
+		models.push_back(pos);
+	}
+
+	EntityMesh* enemy = new EntityMesh(
+		Mesh::Get("data/models/samurai.obj"),
+		nullptr,
+		Shader::Get("data/shaders/instanced.vs", "data/shaders/material.fs"),
+		models
+	);
+
+	root->addChild(enemy);
+}
 
 void World::renderSky() {
 	

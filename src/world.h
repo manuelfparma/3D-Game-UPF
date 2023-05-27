@@ -27,6 +27,9 @@ public:
 	EntityPlayer* player;
 	std::map<std::string, sRenderData> meshes_to_load;
 
+	// stats
+	int enemy_count = 5;
+
 	World(const char* sceneFilename);
 	bool parseScene(const char* filename);
 	void renderSky();
@@ -36,6 +39,8 @@ public:
 	bool checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* collisions);
 	bool checkLineOfSight(Matrix44& obs, Matrix44& target);
 private:
+	void createSkybox();
+	void createEnemies();
 	void collisionCalculations(Mesh* mesh, Matrix44 model, Vector3 target, std::vector<sCollisionData>* collisions);
 };
 
