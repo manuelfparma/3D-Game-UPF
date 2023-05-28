@@ -230,7 +230,7 @@ void EntityPlayer::update(float seconds_elapsed){
 }
 
 void EntityArmy::update(float seconds_elapsed) {
-	onAlert = false;
+	bool playerSeen = false;
 
 	for (int i = 0; i < models.size(); ++i){
 		// get model matrix of current enemy
@@ -239,11 +239,21 @@ void EntityArmy::update(float seconds_elapsed) {
 		stateMachines[i].update(seconds_elapsed);
 		// check if player was found
 		if (stateMachines[i].state == FOUND_STATE) {
-			onAlert = true;
+			playerSeen = true;
 		}
 		// move enemy (state machine updates orientation)
 		if (stateMachines[i].isMoving)
 			mModel->translate(0, 0, moveSpeed * seconds_elapsed);
+	}
+
+	if (playerSeen) {
+		seenCooldown -= seconds_elapsed;
+		if (seenCooldown < 0)
+			onAlert = true;
+	}
+	else {
+		seenCooldown = ATTENTION_TIME;
+		onAlert = false;
 	}
 }
 
