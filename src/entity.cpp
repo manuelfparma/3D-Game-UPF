@@ -121,6 +121,8 @@ EntityArmy::EntityArmy(Mesh* mesh, Texture* texture, Shader* shader, std::vector
 	isDynamic = true;
 	layer = ENEMY;
 	color = SEARCH_COLOR;
+	for (int i = 0; i < models.size(); ++i)
+		stateMachines.push_back(AIBehaviour());
 }
 
 
@@ -227,20 +229,22 @@ void EntityPlayer::update(float seconds_elapsed){
 }
 
 void EntityArmy::update(float seconds_elapsed) {
-	World *world = Game::instance->stageManager->currentStage->world;
-	Matrix44 player = world->player->model;
-	
-	color = SEARCH_COLOR;
+	onAlert = false;
 
 	for (int i = 0; i < models.size(); ++i){
+		// get model matrix of current enemy
 		Matrix44* mModel = &models[i];
-				
-		mModel->translate(0, 0, move_speed * seconds_elapsed);
-
-		// check if we can see the player
-		if (world->checkLineOfSight(*mModel, player)) {
-			color = FOUND_COLOR;
-			break;
-		}
+		// update state machine of current enemy
+		stateMachines[i].update(mModel, seconds_elapsed);
+		// move enemy (state machine update orientation)
+		mModel->translate(0, 0, moveSpeed * seconds_elapsed);
+		// check if player was found
+		if (stateMachines[i].current_state == FOUND_STATE)
+			onAlert = true;
 	}
+}
+
+void EntityArmy::render() {
+	color = onAlert ? FOUND_COLOR : SEARCH_COLOR;
+	EntityCollider::render();
 }
