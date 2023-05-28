@@ -3,7 +3,6 @@
 #include "camera.h"
 #include "world.h"
 
-
 enum StageType {
 	INTRO_STAGE,
 	PLAY_STAGE,
@@ -29,7 +28,7 @@ public:
 	std::vector<Stage*> stages;
 	Stage* currentStage;
 	StageManager();
-	void changeStage(Stage* newState, int exitCode);
+	void changeStage(StageType newState, int exitCode);
 	void render();
 	void update(double seconds_elapsed);
 };
@@ -54,6 +53,7 @@ public:
 
 class OutroStage : public Stage {
 public:
+	std::string text;
 	OutroStage();
 	virtual void render() override;
 	virtual void update(double seconds_elapsed) override;

@@ -84,13 +84,21 @@ public:
 	const float crouch_factor = 0.3f;
 	const float jump_speed = 100.0f;
 	const int max_dashes = 1;
+	const int max_jumps = 1;
 	const float dash_speed = 200.0f;
 	const float gravity_speed = 150.f;
 	const float floor_friction = 0.001f;
-	
+
+
+	const float stamina_growth = 10.f;
+	const float dash_cost = 40.f;
+	const float jump_cost = 20.f;
+
+	int dashes;
+	int jumps;
 	
 	// bool isOnFloor = false;
-	int dashes = 1;
+	float stamina = 100.0f;
 	Vector3 velocity = Vector3(0, 0, 0);
 
 	// Model
@@ -111,4 +119,12 @@ private:
 	Vector4 SEARCH_COLOR = Vector4(0.f, 0.f, 0.5f, 1.f);
 	Vector4 FOUND_COLOR = Vector4(0.5f, 0.f, 0.f, 1.f);
 	float move_speed = 1.f;
+};
+
+
+class EntityUI : public EntityMesh {
+public:
+	EntityUI(Mesh* mesh, Shader* shader, Texture* texture, Vector4 color);
+	void render();
+	void update(float seconds_elapsed);
 };

@@ -3,6 +3,7 @@
 #include "animation.h"
 #include "entity.h"
 #include "utils.h"
+#include "stage.h"
 #include <fstream>
 #include <map>
 
@@ -17,9 +18,20 @@ World::World(const char* sceneFilename) {
     camera->lookAt(Vector3(0.f, 100.f, 100.f), Vector3(0.f, 0.f, 0.f), Vector3(0.f, 1.f, 0.f)); //position the camera and point to 0,0,0
     camera->setPerspective(70.f, Game::instance->window_width / (float)Game::instance->window_height, 0.1f, 10000.f); //set the projection, we want to be perspective
 
+	camera2D = new Camera();
+	camera2D->view_matrix = Matrix44();
+	camera2D->setOrthographic(0, Game::instance->window_width, 0, Game::instance->window_height, -1, 1);
+
 	// initialize root and player
     root = new Entity();
     player = new EntityPlayer();
+	ui = new UI(Game::instance->window_width, Game::instance->window_height, player);
+
+
+	Mesh* collectibleMesh = new Mesh();
+	collectibleMesh->createCube();
+	collectible = new EntityCollider( collectibleMesh, Texture::getBlackTexture(), Shader::getDefaultShader("flat"));
+	collectible->model.setTranslation(Vector3(130.f, 5.f, 30.f));
 
 	createSkybox();
 	createEnemies();
@@ -76,7 +88,7 @@ void World::renderSky() {
 
 
 void World::render() {
-
+	camera->enable();
 	renderSky();
 
 	if (!freeCam) {
@@ -106,11 +118,22 @@ void World::render() {
 	}
 
     root->render(); 
+	//Draw the floor grid
+	drawGrid();
 
 	if (freeCam || !firstPerson)
 		player->render();
 
+	collectible->render();
+
 	enemies->render();
+
+	if (uiEnabled) {
+		camera2D->enable();
+		ui->render();
+	}
+	camera->enable();
+	
 }
 
 void World::update(double seconds_elapsed) {
@@ -135,6 +158,18 @@ void World::update(double seconds_elapsed) {
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_C)) {
 		firstPerson = !firstPerson;
+	}
+
+	if (Input::wasKeyPressed(SDL_SCANCODE_E)) {
+
+		if (checkCollectiblePickup()) {
+			Game::instance->stageManager->changeStage(OUTRO_STAGE, 1);
+		}
+	}
+
+	//TODO: remove
+	if (Input::wasKeyPressed(SDL_SCANCODE_X)) {
+		uiEnabled = !uiEnabled;
 	}
 }
 
@@ -262,6 +297,22 @@ bool World::checkLineOfSight(Matrix44& obs, Matrix44& target) {
 	return false;
 }
 
+bool World::checkCollectiblePickup() {
+
+	Vector3 collectiblePos = collectible->model.getTranslation();
+	Vector3 playerPos = player->model.getTranslation();
+
+	Vector3 vector = playerPos - collectiblePos;
+
+	if (vector.length() > 10.f) return false;
+
+	Vector3 cameraVector = camera->center - camera->eye;
+
+	if (collectible->mesh->testRayCollision(collectible->model, camera->eye, normalize(cameraVector), Vector3(), Vector3(), 10.f)) return true;
+
+	return false;
+};
+
 bool World::parseScene(const char* filename)
 {
 	// You could fill the map manually to add shader and texture for each mesh
@@ -334,4 +385,14 @@ bool World::parseScene(const char* filename)
 
 	std::cout << "Scene [OK]" << " Meshes added: " << mesh_count << std::endl;
 	return true;
+}
+
+
+void World::onResize(int width, int height) {
+
+	ui->width = width;
+	ui->height = height;
+	camera->aspect = width / (float)height;
+	camera2D->setOrthographic(0, width, 0, height, -1, 1);
+
 }

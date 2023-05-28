@@ -3,6 +3,7 @@
 #include "entity.h"
 #include "texture.h"
 #include "game.h"
+#include "ui.h"
 
 struct sRenderData {
 	Texture* texture = nullptr;
@@ -20,12 +21,16 @@ class World
 {
 public:
 	Camera* camera;
+	Camera* camera2D;
 	bool freeCam = false;
 	bool firstPerson = true;
 	Entity* root;
 	EntityMesh* sky;
 	EntityPlayer* player;
 	EntityArmy* enemies;
+	EntityCollider* collectible;
+	bool uiEnabled = true;
+	UI* ui;
 	std::map<std::string, sRenderData> meshes_to_load;
 
 	// stats
@@ -40,10 +45,14 @@ public:
 	void updateCamera(double seconds_elapsed);
 	bool checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* collisions);
 	void checkCameraCollision(Vector3& target);
+	bool checkCollectiblePickup();
 	bool checkLineOfSight(Matrix44& obs, Matrix44& target);
+	void onResize(int width, int height);
+
 private:
 	void createSkybox();
 	void createEnemies();
 	void collisionCalculations(Mesh* mesh, Matrix44 model, Vector3 target, std::vector<sCollisionData>* collisions);
+
 };
 

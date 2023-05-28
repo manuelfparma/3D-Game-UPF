@@ -13,25 +13,16 @@ StageManager::StageManager() {
     currentStage = stages[INTRO_STAGE];
 }
 
-Stage::Stage() {
+Stage::Stage() {   
 }
 
 IntroStage::IntroStage() : Stage() {
     type = INTRO_STAGE;
-    world = new World("data/myscene.scene");
-
-    /*
-    EntityMesh* ambulance_meshed = new EntityMesh();
-    ambulance_meshed->mesh = Mesh::Get("data/ambulance.obj");
-    ambulance_meshed->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/color.fs");
-    ambulance = (Entity*)ambulance_meshed;
-
-    world->root->addChild(ambulance);
-    */
 }
 
 PlayStage::PlayStage() {
     type = PLAY_STAGE;
+    world = new World("data/myscene.scene");
 }
 
 OutroStage::OutroStage() {
@@ -40,12 +31,11 @@ OutroStage::OutroStage() {
 
 
 /* StageManager definitions */
-void StageManager::changeStage(Stage* newStage, int exitCode) {
+void StageManager::changeStage(StageType newStage, int exitCode) {
     StageType currentStageType = this->currentStage->type;
-    StageType nextStageType = newStage->type;
 
     currentStage->onExit(exitCode);
-    this->currentStage = newStage;
+    this->currentStage = stages[newStage];
     currentStage->onEnter(exitCode);
 }
 
@@ -82,6 +72,10 @@ void PlayStage::onEnter(int enterCode) {
 void OutroStage::onEnter(int enterCode) {
 
     switch (enterCode) {
+    case 0:
+        text = "You lose :(";
+    case 1:
+        text = "You win!";
     default:
         break;
     }
@@ -107,6 +101,10 @@ void PlayStage::onExit(int exitCode) {
 
 void OutroStage::onExit(int exitCode) {
 
+    // Create into stage again
+    Stage* newPlayStage = new PlayStage();
+    Game::instance->stageManager->stages[PLAY_STAGE] = newPlayStage;
+
     switch (exitCode) {
     default:
         break;
@@ -115,26 +113,37 @@ void OutroStage::onExit(int exitCode) {
 
 /* render functions */
 void IntroStage::render() {
-    world->render();
+    drawText(Game::instance->window_width / 2, Game::instance->window_height / 2, "Press P to play", Vector3(1, 1, 1));
 }
 
 void PlayStage::render() {
+    
     world->render();
 }
 
 void OutroStage::render() {
-    world->render();
+    drawText(Game::instance->window_width / 2, Game::instance->window_height / 2, text, Vector3(1, 1, 1));
+    drawText(Game::instance->window_width / 2, Game::instance->window_height / 2 + 50, "Press R to restart", Vector3(1, 1, 1));
+
+
 }
 
 /* update functions */
 void IntroStage::update(double seconds_elapsed) {
 
-    world->update(seconds_elapsed);
+    if (Input::wasKeyPressed(SDL_SCANCODE_P)) {
+        Game::instance->stageManager->changeStage(PLAY_STAGE, 0);
+    }
 
 };
 
 void PlayStage::update(double seconds_elapsed) {
+    world->update(seconds_elapsed);
 };
 
 void OutroStage::update(double seconds_elapsed) {
+
+    if (Input::wasKeyPressed(SDL_SCANCODE_R)) {
+        Game::instance->stageManager->changeStage(INTRO_STAGE, 0);
+    }
 }

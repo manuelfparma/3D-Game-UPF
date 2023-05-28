@@ -106,6 +106,11 @@ EntityCollider::EntityCollider(bool isDynamic, COLISSION_LAYER layer) {
 }
 
 EntityPlayer::EntityPlayer() : EntityCollider(true, PLAYER) {
+
+
+	dashes = max_dashes;
+	jumps = max_jumps;
+
 	// set initial position
 	model.setTranslation(initial_pos);
 
@@ -167,17 +172,36 @@ void EntityPlayer::update(float seconds_elapsed){
 	World* world = Game::instance->stageManager->currentStage->world;
 
 	// we suppose the player is on the air
+	bool onFloor = false;
+
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_Q)) {
-		
+		// dashing
 		if (dashes){
-			velocity += move_front * dash_speed;
-			dashes-=1;
+
+			if (stamina >= dash_cost) {
+
+				stamina -= dash_cost;
+				velocity += move_front * dash_speed;
+				dashes-=1;
+
+			}
 		}
-		
 	}
 
-	bool onFloor = false;
+	if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
+		// jumping
+		if (jumps) {
+			if (stamina >= jump_cost) {
+
+				stamina -= jump_cost;
+				velocity.y = jump_speed;
+				jumps -= 1;
+
+			}
+		}
+	}
+
 
 	// check collisions
 	if (world->checkPlayerCollision(position + velocity * seconds_elapsed, &collisions)) {
@@ -189,6 +213,7 @@ void EntityPlayer::update(float seconds_elapsed){
 				
 				onFloor = true;
 				dashes = max_dashes;
+				jumps = max_jumps;
 
 				/* if (!isOnFloor) {
 					onTouchFloor();
@@ -207,9 +232,6 @@ void EntityPlayer::update(float seconds_elapsed){
 	if (!onFloor) {
 		// gravitational pull
 		velocity.y -= gravity_speed * seconds_elapsed;
-	}else if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
-		// jumping
-		velocity.y = jump_speed;
 	}
 
 
@@ -217,6 +239,9 @@ void EntityPlayer::update(float seconds_elapsed){
 	// floor friction
 	velocity.x *= pow(floor_friction, seconds_elapsed);
 	velocity.z *= pow(floor_friction, seconds_elapsed);
+
+	// stamina regen
+	stamina = clamp(stamina + stamina_growth * seconds_elapsed, 0, 100);
 
 	model.setTranslation(position);
 	if (moving || world->firstPerson)
@@ -243,4 +268,31 @@ void EntityArmy::update(float seconds_elapsed) {
 			break;
 		}
 	}
+}
+
+
+EntityUI::EntityUI(Mesh* UImesh, Shader* UIshader, Texture* UItexture, Vector4 UIcolor) {
+	mesh = UImesh;
+	shader = UIshader;
+	texture = UItexture;
+	color = UIcolor;
+}
+
+void EntityUI::render() {
+
+	Camera* camera = Camera::current;
+
+	shader->enable();
+	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	shader->setUniform("u_model", model);
+	shader->setUniform("u_color", color );
+	shader->setUniform("u_texture", texture, 0);
+
+	mesh->render(GL_TRIANGLES);
+
+	shader->disable();
+}
+
+
+void EntityUI::update(float seconds_elapsed) {
 }
