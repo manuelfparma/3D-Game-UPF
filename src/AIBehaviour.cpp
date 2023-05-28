@@ -3,19 +3,71 @@
 #include "world.h"
 #include "stage.h"
 #include "extra/pathfinder/PathFinder.h"
+#include <fstream>
 
 void WayPoint::addLink(WayPoint* other, float distance) {
 	this->addChild(other, distance);
 	other->setParent(this);
 }
 
-AIBehaviour::AIBehaviour(Matrix44* mModel) {
+AIBehaviour::AIBehaviour(Matrix44* mModel, int i) {
 	this->mModel = mModel;
 
+	// parse enemy path file with waypoints info
+	if (!parseEnemyPath(i)) {
+		state = DEAD_STATE;
+		return;
+	}
+
+	/* Code for applying Dijkstra to path
+	// create pathfinder and algorithm
+	PathFinder<WayPoint> p;
+	p.setStart(waypoints.front());
+	p.setGoal(waypoints.back());
+
+	// check if a path is found
+	if (p.findPath<Dijkstra>(current_path)) {
+		current_destination = current_path.begin();
+		rotateEnemyToNewPoint((*current_destination)->position);
+	}
+	*/
+
+	// for now, paths are cyclical
+	for (auto &point : waypoints) {
+		path.push_back(&point);
+	}
+
+	destination = path.begin();
+	Vector3 initial_pos = (*destination)->position;
+	initial_pos.y = 0;
+	mModel->setTranslation(initial_pos);
+	rotateEnemyToNewPoint((*destination)->position);
+}
+
+bool AIBehaviour::parseEnemyPath(int i) {
 	std::vector<Vector3> points;
-	points.push_back(Vector3(15, 0, 0));
-	points.push_back(Vector3(15, 0, 15));
-	points.push_back(Vector3(0, 0, 15));
+
+	char filename[50];
+	sprintf(filename, "data/paths/enemy%d.txt", i);
+
+	std::ifstream file(filename);
+
+	if (!file.good()) {
+		std::cerr << "Enemy [ERROR]" << filename << " not found!" << std::endl;
+		return false;
+	}
+
+	std::string posX, posY, posZ;
+
+	while (file >> posX >> posY >> posZ) {
+		points.push_back(Vector3(
+			(float) atof(posX.c_str()),
+			(float) atof(posY.c_str()),
+			(float) atof(posZ.c_str())
+		));
+	}
+
+	if (points.empty()) return false;
 
 	waypoints.resize(points.size());
 
@@ -30,16 +82,7 @@ AIBehaviour::AIBehaviour(Matrix44* mModel) {
 		);
 	}
 
-	// create pathfinder and algorithm
-	PathFinder<WayPoint> p;
-	p.setStart(waypoints.front());
-	p.setGoal(waypoints.back());
-
-	// check if a path is found
-	if (p.findPath<Dijkstra>(current_path)) {
-		current_destination = current_path.begin();
-		rotateEnemyToNewPoint((*current_destination)->position);
-	}
+	return true;
 }
 
 void AIBehaviour::update(float seconds_elapsed) {
@@ -48,20 +91,20 @@ void AIBehaviour::update(float seconds_elapsed) {
 
 	isMoving = true;
 
-	switch (current_state) 
+	switch (state) 
 	{
 	case SEARCH_STATE:
 		// check if we can see the player
 		if (world->checkLineOfSight(*mModel, player))
-			current_state = FOUND_STATE;
+			state = FOUND_STATE;
 		// check current path movement and orientation
-		else if (checkPointProximity((*current_destination)->position)) {
-			++current_destination;
-			if (current_destination == current_path.end()) {
+		else if (checkPointProximity((*destination)->position)) {
+			++destination;
+			if (destination == path.end()) {
 				// path has finished
-				current_destination = current_path.begin();
+				destination = path.begin();
 			}
-			rotateEnemyToNewPoint((*current_destination)->position);
+			rotateEnemyToNewPoint((*destination)->position);
 		}
 		break;
 
@@ -74,10 +117,14 @@ void AIBehaviour::update(float seconds_elapsed) {
 		}
 		else {
 			// else, return to search state
-			current_state = SEARCH_STATE;
+			state = SEARCH_STATE;
 			// TODO: find closest point in path and go there
-			rotateEnemyToNewPoint((*current_destination)->position);
+			rotateEnemyToNewPoint((*destination)->position);
 		}
+		break;
+
+	case DEAD_STATE:
+		isMoving = false;
 		break;
 	}
 }

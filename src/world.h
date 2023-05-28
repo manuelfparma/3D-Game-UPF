@@ -29,7 +29,7 @@ public:
 	std::map<std::string, sRenderData> meshes_to_load;
 
 	// stats
-	int ENEMY_COUNT = 1;
+	int ENEMY_COUNT = 5;
 	float MAX_VIEW_DISTANCE = 50.f;
 
 	World(const char* sceneFilename);

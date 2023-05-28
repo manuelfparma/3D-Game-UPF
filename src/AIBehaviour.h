@@ -4,7 +4,8 @@
 
 typedef enum {
 	SEARCH_STATE,
-	FOUND_STATE
+	FOUND_STATE,
+	DEAD_STATE
 }
 AI_ACTIONS;
 
@@ -16,17 +17,17 @@ public:
 
 class AIBehaviour {
 public:
-	AI_ACTIONS current_state = SEARCH_STATE;
+	AI_ACTIONS state = SEARCH_STATE;
 	std::vector<WayPoint> waypoints;
 
-	std::vector<WayPoint*> current_path;
-	std::vector<WayPoint*>::iterator current_destination;
+	std::vector<WayPoint*> path;
+	std::vector<WayPoint*>::iterator destination;
 
 	bool isMoving = true;
 
 	void update(float seconds_elapsed);
 
-	AIBehaviour(Matrix44* mModel);
+	AIBehaviour(Matrix44* mModel, int i);
 private:
 	Matrix44* mModel; // pointer to model matrix of enemy
 
@@ -35,4 +36,5 @@ private:
 
 	bool checkPointProximity(Vector3 point);
 	void rotateEnemyToNewPoint(Vector3 point);
+	bool parseEnemyPath(int i);
 };

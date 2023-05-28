@@ -50,13 +50,8 @@ void World::createSkybox() {
 void World::createEnemies() {
 	std::vector<Matrix44> models;
 	std::vector<float> yaws;
-	Matrix44 pos;
 
-	for (int i = 0; i < ENEMY_COUNT; ++i) {
-		pos.setTranslation(Vector3(0.f, 0.2f, 0.f));
-		//pos.rotate(DEG2RAD * (360 / ENEMY_COUNT) * (i % ENEMY_COUNT), Vector3(0, 1, 0));
-		models.push_back(pos);
-	}
+	models.resize(ENEMY_COUNT);
 
 	enemies = new EntityArmy(
 		Mesh::Get("data/models/samurai.obj"),
@@ -135,6 +130,11 @@ void World::update(double seconds_elapsed) {
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_C)) {
 		firstPerson = !firstPerson;
+	}
+
+	if (Input::wasKeyPressed(SDL_SCANCODE_P)) {
+		Vector3 pos = player->model.getTranslation();
+		std::cout << pos.x << " " << pos.y << " " << pos.z << " " << std::endl;
 	}
 }
 

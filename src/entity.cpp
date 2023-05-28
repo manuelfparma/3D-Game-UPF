@@ -122,8 +122,8 @@ EntityArmy::EntityArmy(Mesh* mesh, Texture* texture, Shader* shader, std::vector
 	isDynamic = true;
 	layer = ENEMY;
 	color = SEARCH_COLOR;
-	for (auto &model : this->models)
-		stateMachines.push_back(AIBehaviour(&model));
+	for (int i = 0; i < this->models.size(); ++i)
+		stateMachines.push_back(AIBehaviour(&this->models[i], i));
 }
 
 
@@ -238,7 +238,7 @@ void EntityArmy::update(float seconds_elapsed) {
 		// update state machine of current enemy
 		stateMachines[i].update(seconds_elapsed);
 		// check if player was found
-		if (stateMachines[i].current_state == FOUND_STATE) {
+		if (stateMachines[i].state == FOUND_STATE) {
 			onAlert = true;
 		}
 		// move enemy (state machine updates orientation)
