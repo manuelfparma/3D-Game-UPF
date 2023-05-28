@@ -34,7 +34,7 @@ public:
 	std::map<std::string, sRenderData> meshes_to_load;
 
 	// stats
-	int ENEMY_COUNT = 4;
+	int ENEMY_COUNT = 5;
 	float MAX_VIEW_DISTANCE = 50.f;
 
 	World(const char* sceneFilename);
@@ -45,10 +45,9 @@ public:
 	void updateCamera(double seconds_elapsed);
 	bool checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* collisions);
 	void checkCameraCollision(Vector3& target);
+	bool checkLineOfSight(Matrix44& obs, Vector3 target);
 	bool checkCollectiblePickup();
-	bool checkLineOfSight(Matrix44& obs, Matrix44& target);
 	void onResize(int width, int height);
-
 private:
 	void createSkybox();
 	void createEnemies();

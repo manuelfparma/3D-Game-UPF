@@ -62,13 +62,8 @@ void World::createSkybox() {
 void World::createEnemies() {
 	std::vector<Matrix44> models;
 	std::vector<float> yaws;
-	Matrix44 pos;
 
-	for (int i = 1; i <= ENEMY_COUNT; ++i) {
-		pos.setTranslation(Vector3(5.f * i, 0.2f, 0.f));
-		pos.rotate(DEG2RAD * (360 / ENEMY_COUNT) * (i % ENEMY_COUNT), Vector3(0, 1, 0));
-		models.push_back(pos);
-	}
+	models.resize(ENEMY_COUNT);
 
 	enemies = new EntityArmy(
 		Mesh::Get("data/models/samurai.obj"),
@@ -171,6 +166,11 @@ void World::update(double seconds_elapsed) {
 	if (Input::wasKeyPressed(SDL_SCANCODE_X)) {
 		uiEnabled = !uiEnabled;
 	}
+
+	if (Input::wasKeyPressed(SDL_SCANCODE_P)) {
+		Vector3 pos = player->model.getTranslation();
+		std::cout << pos.x << " " << pos.y << " " << pos.z << " " << std::endl;
+	}
 }
 
 void World::updateCamera(double seconds_elapsed) {
@@ -259,9 +259,9 @@ void World::checkCameraCollision(Vector3& target) {
 	}
 }
 
-bool World::checkLineOfSight(Matrix44& obs, Matrix44& target) {
-	Vector3 front = normalize(obs.frontVector());
-	Vector3 toTarget = target.getTranslation() - obs.getTranslation();
+bool World::checkLineOfSight(Matrix44& obs, Vector3 target) {
+	Vector3 front = obs.frontVector();
+	Vector3 toTarget = target - obs.getTranslation();
 
 	float distance = toTarget.length();
 
