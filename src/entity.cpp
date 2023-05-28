@@ -66,7 +66,7 @@ void EntityMesh::render()
 	if (isInstanced) {
 		// we will check which models to render
 		std::vector<Matrix44> render_models;
-		for (auto& model : models)
+		for (auto model : models)
 			if (checkRender(model, mesh))
 				render_models.push_back(model);
 		mesh->renderInstanced(GL_TRIANGLES, render_models.data(), render_models.size());
@@ -96,7 +96,8 @@ EntityMesh::EntityMesh(Mesh* mesh, Texture* texture, Shader* shader, std::vector
 	this->texture = texture;
 	this->shader = shader;
 	this->isInstanced = true;
-	this->models = models;
+	for (auto &model : models)
+		this->models.push_back(model);
 }
 
 
@@ -121,8 +122,8 @@ EntityArmy::EntityArmy(Mesh* mesh, Texture* texture, Shader* shader, std::vector
 	isDynamic = true;
 	layer = ENEMY;
 	color = SEARCH_COLOR;
-	for (int i = 0; i < models.size(); ++i)
-		stateMachines.push_back(AIBehaviour());
+	for (auto &model : this->models)
+		stateMachines.push_back(AIBehaviour(&model));
 }
 
 
@@ -235,12 +236,15 @@ void EntityArmy::update(float seconds_elapsed) {
 		// get model matrix of current enemy
 		Matrix44* mModel = &models[i];
 		// update state machine of current enemy
-		stateMachines[i].update(mModel, seconds_elapsed);
-		// move enemy (state machine update orientation)
-		mModel->translate(0, 0, moveSpeed * seconds_elapsed);
+		stateMachines[i].update(seconds_elapsed);
 		// check if player was found
-		if (stateMachines[i].current_state == FOUND_STATE)
+		if (stateMachines[i].current_state == FOUND_STATE) {
 			onAlert = true;
+		}
+		else {
+			// move enemy (state machine updates orientation)
+			mModel->translate(0, 0, moveSpeed * seconds_elapsed);
+		}
 	}
 }
 

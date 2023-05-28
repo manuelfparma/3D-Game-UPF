@@ -115,5 +115,5 @@ private:
 	// constants
 	Vector4 SEARCH_COLOR = Vector4(0.f, 0.f, 0.5f, 1.f);
 	Vector4 FOUND_COLOR = Vector4(0.5f, 0.f, 0.f, 1.f);
-	float moveSpeed = 1.f;
+	float moveSpeed = 5.f;
 };

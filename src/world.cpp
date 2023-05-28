@@ -52,9 +52,9 @@ void World::createEnemies() {
 	std::vector<float> yaws;
 	Matrix44 pos;
 
-	for (int i = 1; i <= ENEMY_COUNT; ++i) {
-		pos.setTranslation(Vector3(5.f * i, 0.2f, 0.f));
-		pos.rotate(DEG2RAD * (360 / ENEMY_COUNT) * (i % ENEMY_COUNT), Vector3(0, 1, 0));
+	for (int i = 0; i < ENEMY_COUNT; ++i) {
+		pos.setTranslation(Vector3(0.f, 0.2f, 0.f));
+		//pos.rotate(DEG2RAD * (360 / ENEMY_COUNT) * (i % ENEMY_COUNT), Vector3(0, 1, 0));
 		models.push_back(pos);
 	}
 
@@ -225,7 +225,7 @@ void World::checkCameraCollision(Vector3& target) {
 }
 
 bool World::checkLineOfSight(Matrix44& obs, Matrix44& target) {
-	Vector3 front = normalize(obs.frontVector());
+	Vector3 front = obs.frontVector();
 	Vector3 toTarget = target.getTranslation() - obs.getTranslation();
 
 	float distance = toTarget.length();

@@ -144,15 +144,25 @@
     <ClInclude Include="..\..\src\entity.h" />
     <ClInclude Include="..\..\src\stage.h" />
     <ClInclude Include="..\..\src\world.h" />
-    <ClInclude Include="..\..\src\extra\pathfinder\AStar.h" />
-    <ClInclude Include="..\..\src\extra\pathfinder\Dijkstra.h" />
-    <ClInclude Include="..\..\src\extra\pathfinder\Node.h" />
-    <ClInclude Include="..\..\src\extra\pathfinder\PathAlgorithm.h" />
-    <ClInclude Include="..\..\src\extra\pathfinder\PathFinder.h" />
     <ClInclude Include="..\..\src\extra\bass.h">
       <Filter>extra</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\AIBehaviour.h" />
+    <ClInclude Include="..\..\src\extra\pathfinder\PathAlgorithm.h">
+      <Filter>extra\pathfinder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\extra\pathfinder\PathFinder.h">
+      <Filter>extra\pathfinder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\extra\pathfinder\AStar.h">
+      <Filter>extra\pathfinder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\extra\pathfinder\Dijkstra.h">
+      <Filter>extra\pathfinder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\extra\pathfinder\Node.h">
+      <Filter>extra\pathfinder</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="extra">
