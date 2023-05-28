@@ -3,7 +3,6 @@
 #include "camera.h"
 #include "world.h"
 
-
 enum StageType {
 	INTRO_STAGE,
 	PLAY_STAGE,

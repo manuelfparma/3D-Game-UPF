@@ -17,9 +17,14 @@ World::World(const char* sceneFilename) {
     camera->lookAt(Vector3(0.f, 100.f, 100.f), Vector3(0.f, 0.f, 0.f), Vector3(0.f, 1.f, 0.f)); //position the camera and point to 0,0,0
     camera->setPerspective(70.f, Game::instance->window_width / (float)Game::instance->window_height, 0.1f, 10000.f); //set the projection, we want to be perspective
 
+	camera2D = new Camera();
+	camera2D->view_matrix = Matrix44();
+	camera2D->setOrthographic(0, Game::instance->window_width, 0, Game::instance->window_height, -1, 1);
+
 	// initialize root and player
     root = new Entity();
     player = new EntityPlayer();
+	ui = new UI(Game::instance->window_width, Game::instance->window_height, player);
 
 	createSkybox();
 	createEnemies();
@@ -105,12 +110,20 @@ void World::render() {
 		camera->lookAt(eye, center, Vector3(0, 1, 0));
 	}
 
+	camera->enable();
     root->render(); 
 
 	if (freeCam || !firstPerson)
 		player->render();
 
 	enemies->render();
+
+	if (uiEnabled) {
+		camera2D->enable();
+		ui->render();
+	}
+	camera->enable();
+	
 }
 
 void World::update(double seconds_elapsed) {
@@ -135,6 +148,12 @@ void World::update(double seconds_elapsed) {
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_C)) {
 		firstPerson = !firstPerson;
+	}
+
+
+	//TODO: remove
+	if (Input::wasKeyPressed(SDL_SCANCODE_X)) {
+		uiEnabled = !uiEnabled;
 	}
 }
 
@@ -334,4 +353,14 @@ bool World::parseScene(const char* filename)
 
 	std::cout << "Scene [OK]" << " Meshes added: " << mesh_count << std::endl;
 	return true;
+}
+
+
+void World::onResize(int width, int height) {
+
+	ui->width = width;
+	ui->height = height;
+	camera->aspect = width / (float)height;
+	camera2D->setOrthographic(0, width, 0, height, -1, 1);
+
 }

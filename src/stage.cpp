@@ -13,21 +13,12 @@ StageManager::StageManager() {
     currentStage = stages[INTRO_STAGE];
 }
 
-Stage::Stage() {
+Stage::Stage() {   
 }
 
 IntroStage::IntroStage() : Stage() {
     type = INTRO_STAGE;
     world = new World("data/myscene.scene");
-
-    /*
-    EntityMesh* ambulance_meshed = new EntityMesh();
-    ambulance_meshed->mesh = Mesh::Get("data/ambulance.obj");
-    ambulance_meshed->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/color.fs");
-    ambulance = (Entity*)ambulance_meshed;
-
-    world->root->addChild(ambulance);
-    */
 }
 
 PlayStage::PlayStage() {
@@ -115,10 +106,13 @@ void OutroStage::onExit(int exitCode) {
 
 /* render functions */
 void IntroStage::render() {
+   
     world->render();
+
 }
 
 void PlayStage::render() {
+    
     world->render();
 }
 

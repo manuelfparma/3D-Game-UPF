@@ -156,7 +156,8 @@ void Game::onResize(int width, int height)
 {
     std::cout << "window resized: " << width << "," << height << std::endl;
 	glViewport( 0,0, width, height );
-	stageManager->currentStage->world->camera->aspect =  width / (float)height;
+
+	stageManager->currentStage->world->onResize(width, height);
 	window_width = width;
 	window_height = height;
 }
