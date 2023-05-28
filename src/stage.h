@@ -53,6 +53,7 @@ public:
 
 class OutroStage : public Stage {
 public:
+	std::string text;
 	OutroStage();
 	virtual void render() override;
 	virtual void update(double seconds_elapsed) override;

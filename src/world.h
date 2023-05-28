@@ -28,6 +28,7 @@ public:
 	EntityMesh* sky;
 	EntityPlayer* player;
 	EntityArmy* enemies;
+	EntityCollider* collectible;
 	bool uiEnabled = true;
 	UI* ui;
 	std::map<std::string, sRenderData> meshes_to_load;
@@ -44,6 +45,7 @@ public:
 	void updateCamera(double seconds_elapsed);
 	bool checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* collisions);
 	void checkCameraCollision(Vector3& target);
+	bool checkCollectiblePickup();
 	bool checkLineOfSight(Matrix44& obs, Matrix44& target);
 	void onResize(int width, int height);
 

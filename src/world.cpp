@@ -3,6 +3,7 @@
 #include "animation.h"
 #include "entity.h"
 #include "utils.h"
+#include "stage.h"
 #include <fstream>
 #include <map>
 
@@ -25,6 +26,12 @@ World::World(const char* sceneFilename) {
     root = new Entity();
     player = new EntityPlayer();
 	ui = new UI(Game::instance->window_width, Game::instance->window_height, player);
+
+
+	Mesh* collectibleMesh = new Mesh();
+	collectibleMesh->createCube();
+	collectible = new EntityCollider( collectibleMesh, Texture::getBlackTexture(), Shader::getDefaultShader("flat"));
+	collectible->model.setTranslation(Vector3(130.f, 5.f, 30.f));
 
 	createSkybox();
 	createEnemies();
@@ -117,6 +124,8 @@ void World::render() {
 	if (freeCam || !firstPerson)
 		player->render();
 
+	collectible->render();
+
 	enemies->render();
 
 	if (uiEnabled) {
@@ -151,6 +160,12 @@ void World::update(double seconds_elapsed) {
 		firstPerson = !firstPerson;
 	}
 
+	if (Input::wasKeyPressed(SDL_SCANCODE_E)) {
+
+		if (checkCollectiblePickup()) {
+			Game::instance->stageManager->changeStage(OUTRO_STAGE, 1);
+		}
+	}
 
 	//TODO: remove
 	if (Input::wasKeyPressed(SDL_SCANCODE_X)) {
@@ -281,6 +296,22 @@ bool World::checkLineOfSight(Matrix44& obs, Matrix44& target) {
 
 	return false;
 }
+
+bool World::checkCollectiblePickup() {
+
+	Vector3 collectiblePos = collectible->model.getTranslation();
+	Vector3 playerPos = player->model.getTranslation();
+
+	Vector3 vector = playerPos - collectiblePos;
+
+	if (vector.length() > 10.f) return false;
+
+	Vector3 cameraVector = camera->center - camera->eye;
+
+	if (collectible->mesh->testRayCollision(collectible->model, camera->eye, normalize(cameraVector), Vector3(), Vector3(), 10.f)) return true;
+
+	return false;
+};
 
 bool World::parseScene(const char* filename)
 {

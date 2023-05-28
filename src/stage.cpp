@@ -72,6 +72,10 @@ void PlayStage::onEnter(int enterCode) {
 void OutroStage::onEnter(int enterCode) {
 
     switch (enterCode) {
+    case 0:
+        text = "You lose :(";
+    case 1:
+        text = "You win!";
     default:
         break;
     }
@@ -97,6 +101,10 @@ void PlayStage::onExit(int exitCode) {
 
 void OutroStage::onExit(int exitCode) {
 
+    // Create into stage again
+    Stage* newPlayStage = new PlayStage();
+    Game::instance->stageManager->stages[PLAY_STAGE] = newPlayStage;
+
     switch (exitCode) {
     default:
         break;
@@ -114,6 +122,10 @@ void PlayStage::render() {
 }
 
 void OutroStage::render() {
+    drawText(Game::instance->window_width / 2, Game::instance->window_height / 2, text, Vector3(1, 1, 1));
+    drawText(Game::instance->window_width / 2, Game::instance->window_height / 2 + 50, "Press R to restart", Vector3(1, 1, 1));
+
+
 }
 
 /* update functions */
@@ -130,4 +142,8 @@ void PlayStage::update(double seconds_elapsed) {
 };
 
 void OutroStage::update(double seconds_elapsed) {
+
+    if (Input::wasKeyPressed(SDL_SCANCODE_R)) {
+        Game::instance->stageManager->changeStage(INTRO_STAGE, 0);
+    }
 }
