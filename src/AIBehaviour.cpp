@@ -44,7 +44,9 @@ AIBehaviour::AIBehaviour(Matrix44* mModel) {
 
 void AIBehaviour::update(float seconds_elapsed) {
 	World* world = Game::instance->stageManager->currentStage->world;
-	Matrix44 player = world->player->model;
+	Vector3 player = world->player->model.getTranslation();
+
+	isMoving = true;
 
 	switch (current_state) 
 	{
@@ -53,7 +55,7 @@ void AIBehaviour::update(float seconds_elapsed) {
 		if (world->checkLineOfSight(*mModel, player))
 			current_state = FOUND_STATE;
 		// check current path movement and orientation
-		else if (checkWayPointProximity(*current_destination)) {
+		else if (checkPointProximity((*current_destination)->position)) {
 			++current_destination;
 			if (current_destination == current_path.end()) {
 				// path has finished
@@ -64,17 +66,24 @@ void AIBehaviour::update(float seconds_elapsed) {
 		break;
 
 	case FOUND_STATE:
-		if (!world->checkLineOfSight(*mModel, player))
+		rotateEnemyToNewPoint(player);
+
+		if (world->checkLineOfSight(*mModel, player)) {
+			// if we are close to the player, stop moving
+			isMoving = !checkPointProximity(player);
+		}
+		else {
+			// else, return to search state
 			current_state = SEARCH_STATE;
+			// TODO: find closest point in path and go there
+			rotateEnemyToNewPoint((*current_destination)->position);
+		}
 		break;
 	}
 }
 
-bool AIBehaviour::checkWayPointProximity(WayPoint* point) {
-	Vector3 currentPos = mModel->getTranslation();
-	Vector3 nextPos = (*current_destination)->position;
-	
-	return (currentPos - nextPos).length() < EPSILON;
+bool AIBehaviour::checkPointProximity(Vector3 point) {
+	return (mModel->getTranslation() - point).length() < EPSILON;
 }
 
 void AIBehaviour::rotateEnemyToNewPoint(Vector3 point) {

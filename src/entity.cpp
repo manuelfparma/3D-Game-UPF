@@ -241,10 +241,9 @@ void EntityArmy::update(float seconds_elapsed) {
 		if (stateMachines[i].current_state == FOUND_STATE) {
 			onAlert = true;
 		}
-		else {
-			// move enemy (state machine updates orientation)
+		// move enemy (state machine updates orientation)
+		if (stateMachines[i].isMoving)
 			mModel->translate(0, 0, moveSpeed * seconds_elapsed);
-		}
 	}
 }
 

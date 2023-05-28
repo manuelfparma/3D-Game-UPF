@@ -40,7 +40,7 @@ public:
 	void updateCamera(double seconds_elapsed);
 	bool checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* collisions);
 	void checkCameraCollision(Vector3& target);
-	bool checkLineOfSight(Matrix44& obs, Matrix44& target);
+	bool checkLineOfSight(Matrix44& obs, Vector3 target);
 private:
 	void createSkybox();
 	void createEnemies();

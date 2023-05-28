@@ -22,6 +22,8 @@ public:
 	std::vector<WayPoint*> current_path;
 	std::vector<WayPoint*>::iterator current_destination;
 
+	bool isMoving = true;
+
 	void update(float seconds_elapsed);
 
 	AIBehaviour(Matrix44* mModel);
@@ -31,6 +33,6 @@ private:
 	// constants
 	float EPSILON = 1.f;
 
-	bool checkWayPointProximity(WayPoint *point);
+	bool checkPointProximity(Vector3 point);
 	void rotateEnemyToNewPoint(Vector3 point);
 };

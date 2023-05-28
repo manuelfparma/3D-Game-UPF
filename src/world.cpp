@@ -224,9 +224,9 @@ void World::checkCameraCollision(Vector3& target) {
 	}
 }
 
-bool World::checkLineOfSight(Matrix44& obs, Matrix44& target) {
+bool World::checkLineOfSight(Matrix44& obs, Vector3 target) {
 	Vector3 front = obs.frontVector();
-	Vector3 toTarget = target.getTranslation() - obs.getTranslation();
+	Vector3 toTarget = target - obs.getTranslation();
 
 	float distance = toTarget.length();
 
