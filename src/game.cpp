@@ -61,8 +61,6 @@ void Game::render(void)
 
 	//set the camera as default
 	
-	stageManager->currentStage->world->camera->enable();
-
 	//set flags
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
@@ -96,8 +94,6 @@ void Game::render(void)
 	}
 	*/
 
-	//Draw the floor grid
-	drawGrid();
 
 	//render the FPS, Draw Calls, etc
 	drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2);

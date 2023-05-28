@@ -18,11 +18,11 @@ Stage::Stage() {
 
 IntroStage::IntroStage() : Stage() {
     type = INTRO_STAGE;
-    world = new World("data/myscene.scene");
 }
 
 PlayStage::PlayStage() {
     type = PLAY_STAGE;
+    world = new World("data/myscene.scene");
 }
 
 OutroStage::OutroStage() {
@@ -31,12 +31,11 @@ OutroStage::OutroStage() {
 
 
 /* StageManager definitions */
-void StageManager::changeStage(Stage* newStage, int exitCode) {
+void StageManager::changeStage(StageType newStage, int exitCode) {
     StageType currentStageType = this->currentStage->type;
-    StageType nextStageType = newStage->type;
 
     currentStage->onExit(exitCode);
-    this->currentStage = newStage;
+    this->currentStage = stages[newStage];
     currentStage->onEnter(exitCode);
 }
 
@@ -106,9 +105,7 @@ void OutroStage::onExit(int exitCode) {
 
 /* render functions */
 void IntroStage::render() {
-   
-    world->render();
-
+    drawText(Game::instance->window_width / 2, Game::instance->window_height / 2, "Press P to play", Vector3(1, 1, 1));
 }
 
 void PlayStage::render() {
@@ -117,17 +114,19 @@ void PlayStage::render() {
 }
 
 void OutroStage::render() {
-    world->render();
 }
 
 /* update functions */
 void IntroStage::update(double seconds_elapsed) {
 
-    world->update(seconds_elapsed);
+    if (Input::wasKeyPressed(SDL_SCANCODE_P)) {
+        Game::instance->stageManager->changeStage(PLAY_STAGE, 0);
+    }
 
 };
 
 void PlayStage::update(double seconds_elapsed) {
+    world->update(seconds_elapsed);
 };
 
 void OutroStage::update(double seconds_elapsed) {

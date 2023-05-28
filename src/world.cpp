@@ -81,7 +81,7 @@ void World::renderSky() {
 
 
 void World::render() {
-
+	camera->enable();
 	renderSky();
 
 	if (!freeCam) {
@@ -110,8 +110,9 @@ void World::render() {
 		camera->lookAt(eye, center, Vector3(0, 1, 0));
 	}
 
-	camera->enable();
     root->render(); 
+	//Draw the floor grid
+	drawGrid();
 
 	if (freeCam || !firstPerson)
 		player->render();
