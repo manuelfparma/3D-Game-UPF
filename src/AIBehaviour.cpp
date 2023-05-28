@@ -118,7 +118,8 @@ void AIBehaviour::update(float seconds_elapsed) {
 		else {
 			// else, return to search state
 			state = SEARCH_STATE;
-			// TODO: find closest point in path and go there
+			// find closest point in path and go there
+			findClosestWayPoint();
 			rotateEnemyToNewPoint((*destination)->position);
 		}
 		break;
@@ -136,4 +137,20 @@ bool AIBehaviour::checkPointProximity(Vector3 point) {
 void AIBehaviour::rotateEnemyToNewPoint(Vector3 point) {
 	float yaw = mModel->getYawRotationToAimTo(point);
 	mModel->rotate(yaw, Vector3(0, 1, 0));
+}
+
+void AIBehaviour::findClosestWayPoint() {
+	Vector3 currentPos = mModel->getTranslation();
+
+	auto it = path.begin();
+	double min = 999999.0;
+
+	while (it != path.end()) {
+		double dist = ((*it)->position - currentPos).length();
+		if (dist < min) {
+			min = dist;
+			destination = it;
+		}
+		++it;
+	}
 }

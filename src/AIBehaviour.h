@@ -37,4 +37,5 @@ private:
 	bool checkPointProximity(Vector3 point);
 	void rotateEnemyToNewPoint(Vector3 point);
 	bool parseEnemyPath(int i);
+	void findClosestWayPoint();
 };
