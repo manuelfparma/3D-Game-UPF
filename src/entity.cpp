@@ -5,6 +5,7 @@
 #include "game.h"
 #include "stage.h"
 #include <iostream>
+#include "animation.h"
 
 Matrix44 Entity::getGlobalMatrix()
 {
@@ -116,8 +117,10 @@ EntityPlayer::EntityPlayer() : EntityCollider(true, PLAYER) {
 	model.setTranslation(initial_pos);
 
 	// Model
-	mesh = Mesh::Get("data/models/ninja.obj");
-	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/material.fs");
+	//mesh = Mesh::Get("data/models/ninja.obj");
+	mesh = Mesh::Get("data/models/ninja.MESH");
+	//shader = Shader::Get("data/shaders/basic.vs", "data/shaders/material.fs");
+	shader = Shader::Get("data/shaders/skinning.vs", "data/shaders/material.fs");
 	color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
@@ -252,6 +255,19 @@ void EntityPlayer::update(float seconds_elapsed){
 	model.rotate(lastYaw, Vector3(0, 1, 0));
 	// isOnFloor = onFloor;
 
+}
+
+void EntityPlayer::render() {
+	Animation* anim = Animation::Get("data/animations/dancing.skanim");
+	anim->assignTime(Game::instance->time);
+
+	shader->enable();
+	shader->setUniform("u_color", color);
+	shader->setUniform("u_viewprojection", Camera::current->viewprojection_matrix);
+	shader->setUniform("u_model", getGlobalMatrix());
+	mesh->renderAnimated(GL_TRIANGLES, &anim->skeleton);
+	shader->disable();
+	//EntityMesh::render();
 }
 
 void EntityArmy::update(float seconds_elapsed) {

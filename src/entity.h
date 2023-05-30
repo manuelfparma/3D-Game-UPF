@@ -16,7 +16,7 @@ public:
 	Matrix44 model;
 
 	virtual void render();
-	virtual void update(double elapsed_time) {};
+	virtual void update(float elapsed_time) {};
 
 	// world coordinates transform
 	Matrix44 getGlobalMatrix();
@@ -106,7 +106,8 @@ public:
 	float model_height = 5.f;
 
 	void onTouchFloor();
-	void update(float seconds_elapsed);
+	void update(float seconds_elapsed) override;
+	void render() override;
 	EntityPlayer();
 };
 
