@@ -75,6 +75,7 @@
     <ClCompile Include="..\..\src\world.cpp" />
     <ClCompile Include="..\..\src\AIBehaviour.cpp" />
     <ClCompile Include="..\..\src\ui.cpp" />
+    <ClCompile Include="..\..\src\EntityAnimation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\camera.h" />
@@ -165,6 +166,7 @@
       <Filter>extra\pathfinder</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\ui.h" />
+    <ClInclude Include="..\..\src\EntityAnimation.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="extra">

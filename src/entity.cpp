@@ -235,6 +235,12 @@ void EntityPlayer::update(float seconds_elapsed){
 		}
 	}
 
+	//TODO: DEV
+	if (Input::wasButtonPressed(SDL_SCANCODE_R)) {
+		model.setTranslation(initial_pos);
+	}
+
+
 	if (!onFloor) {
 		// gravitational pull
 		velocity.y -= gravity_speed * seconds_elapsed;
