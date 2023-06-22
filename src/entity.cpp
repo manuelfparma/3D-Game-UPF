@@ -118,10 +118,10 @@ EntityPlayer::EntityPlayer() : EntityCollider(true, PLAYER) {
 
 	// Model
 	//mesh = Mesh::Get("data/models/ninja.obj");
-	mesh = Mesh::Get("data/models/ninja.MESH");
+	mesh = Mesh::Get("data/models/ninja_textured.MESH");
+	texture = Texture::Get("data/textures/ninja_texture.png");
 	//shader = Shader::Get("data/shaders/basic.vs", "data/shaders/material.fs");
-	shader = Shader::Get("data/shaders/skinning.vs", "data/shaders/material.fs");
-	color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	shader = Shader::Get("data/shaders/skinning.vs", "data/shaders/texture.fs");
 }
 
 EntityArmy::EntityArmy(Mesh* mesh, Texture* texture, Shader* shader, std::vector<Matrix44> models)
@@ -264,7 +264,7 @@ void EntityPlayer::update(float seconds_elapsed){
 }
 
 void EntityPlayer::render() {
-	Animation* anim = Animation::Get("data/animations/dancing.skanim");
+	Animation* anim = Animation::Get("data/animations/idle.skanim");
 	anim->assignTime(Game::instance->time);
 
 	shader->enable();
