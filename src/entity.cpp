@@ -338,11 +338,9 @@ void EntityArmy::render() {
 	// first we render normal enemies
 	mesh->renderInstanced(GL_TRIANGLES, normal_render.data(), normal_render.size());
 
-	// now we render marked enemies after disabling z-buffer
-	glDisable(GL_DEPTH_TEST);
+	// now we render marked enemies after clearing z-buffer
+	glClear(GL_DEPTH_BUFFER_BIT);
 	mesh->renderInstanced(GL_TRIANGLES, marked_render.data(), marked_render.size());
-	glEnable(GL_DEPTH_TEST);
-
 
 	// Disable shader after finishing rendering
 	shader->disable();
