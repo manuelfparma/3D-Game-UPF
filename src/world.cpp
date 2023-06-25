@@ -66,9 +66,9 @@ void World::createEnemies() {
 	models.resize(ENEMY_COUNT);
 
 	enemies = new EntityArmy(
-		Mesh::Get("data/models/samurai.obj"),
-		nullptr,
-		Shader::Get("data/shaders/instanced.vs", "data/shaders/material.fs"),
+		Mesh::Get("data/models/new_samurai.obj"),
+		Texture::Get("data/textures/new-samurai-texture.tga"),
+		Shader::Get("data/shaders/instanced.vs", "data/shaders/texture.fs"),
 		models
 	);
 }

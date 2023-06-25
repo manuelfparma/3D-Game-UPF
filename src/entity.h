@@ -124,8 +124,8 @@ public:
 	EntityArmy(Mesh* mesh, Texture* texture, Shader* shader, std::vector<Matrix44> models);
 private:
 	// constants
-	Vector4 SEARCH_COLOR = Vector4(0.f, 0.f, 0.5f, 1.f);
-	Vector4 FOUND_COLOR = Vector4(0.5f, 0.f, 0.f, 1.f);
+	Vector4 SEARCH_COLOR = Vector4(0.f, 0.f, 0.8f, 1.f);
+	Vector4 FOUND_COLOR = Vector4(0.8f, 0.f, 0.f, 1.f);
 	float moveSpeed = 10.f;
 	float ATTENTION_TIME = 3.f;
 };
