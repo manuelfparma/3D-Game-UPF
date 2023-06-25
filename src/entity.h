@@ -114,6 +114,7 @@ public:
 class EntityArmy : public EntityCollider {
 public:
 	std::vector<AIBehaviour> stateMachines;
+	std::vector<bool> marked;
 	bool onAlert = false;
 	float seenCooldown = ATTENTION_TIME;
 

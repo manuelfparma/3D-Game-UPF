@@ -121,6 +121,7 @@ void World::render() {
 
 	collectible->render();
 
+	// enemies should be last to render because of z-buffer
 	enemies->render();
 
 	if (uiEnabled) {

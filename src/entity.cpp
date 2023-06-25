@@ -132,6 +132,7 @@ EntityArmy::EntityArmy(Mesh* mesh, Texture* texture, Shader* shader, std::vector
 	color = SEARCH_COLOR;
 	for (int i = 0; i < this->models.size(); ++i)
 		stateMachines.push_back(AIBehaviour(&this->models[i], i));
+	marked.resize(models.size(), false);
 }
 
 
@@ -305,8 +306,46 @@ void EntityArmy::update(float seconds_elapsed) {
 }
 
 void EntityArmy::render() {
+	// Get the last camera that was activated 
+	Camera* camera = Camera::current;
+
+	// TODO: color for each indivudual army member?
 	color = onAlert ? FOUND_COLOR : SEARCH_COLOR;
-	EntityCollider::render();
+
+	// Enable shader and pass uniforms 
+	shader->enable();
+	shader->setUniform("u_color", color);
+	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	if (texture) shader->setTexture("u_texture", texture, 0);
+
+	// First we will check which enemies are marked and which aren't
+	std::vector<Matrix44> normal_render;
+	std::vector<Matrix44> marked_render;
+
+	for (int i = 0; i < models.size(); i++) {
+		// if enemy is outside fulstrum, don't render
+		if (!checkRender(models[i], mesh))
+			continue;
+		// if enemy is marked, we have to render them without z-buffer
+		if (marked[i]) {
+			marked_render.push_back(models[i]);
+		}
+		else {
+			normal_render.push_back(models[i]);
+		}
+	}
+
+	// first we render normal enemies
+	mesh->renderInstanced(GL_TRIANGLES, normal_render.data(), normal_render.size());
+
+	// now we render marked enemies after disabling z-buffer
+	glDisable(GL_DEPTH_TEST);
+	mesh->renderInstanced(GL_TRIANGLES, marked_render.data(), marked_render.size());
+	glEnable(GL_DEPTH_TEST);
+
+
+	// Disable shader after finishing rendering
+	shader->disable();
 }
 
 
