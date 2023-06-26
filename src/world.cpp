@@ -116,13 +116,13 @@ void World::render() {
 	//Draw the floor grid
 	drawGrid();
 
-	if (freeCam || !firstPerson)
-		player->render();
-
 	collectible->render();
 
 	// enemies should be last to render because of z-buffer
 	enemies->render();
+
+	if (freeCam || !firstPerson)
+		player->render();
 
 	if (uiEnabled) {
 		camera2D->enable();
@@ -331,7 +331,7 @@ void World::checkEnemyMarking() {
 
 	// check if player is looking at an enemy
 	for (int i = 0; i < enemies->size; i++) {
-		max_dist = (player->model.getTranslation() - enemies->models[i].getTranslation()).length();
+		max_dist = (rayOrigin - enemies->models[i].getTranslation()).length();
 
 		if (enemies->mesh->testRayCollision(enemies->models[i], rayOrigin, 
 			cameraDirection, Vector3(), Vector3(), max_dist)) {

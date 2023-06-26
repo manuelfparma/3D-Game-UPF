@@ -23,7 +23,7 @@ public:
 	Camera* camera;
 	Camera* camera2D;
 	bool freeCam = false;
-	bool firstPerson = true;
+	bool firstPerson = false;
 	Entity* root;
 	EntityMesh* sky;
 	EntityPlayer* player;
