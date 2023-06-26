@@ -202,16 +202,18 @@ void World::collisionCalculations(Mesh* mesh, Matrix44 model, Vector3 target, st
 	target.y += max_dist;
 
 	// wall colision
-	if (!mesh->testSphereCollision(model, target, max_dist, col_point, col_normal)) return;
-	// add colision to list
-	col_normal.normalize();
-	collisions->push_back({ col_point, col_normal });
-
+	if (mesh->testSphereCollision(model, target, max_dist / 4, col_point, col_normal)) {
+		// add colision to list
+		col_normal.normalize();
+		collisions->push_back({ col_point, col_normal });
+	}
+	
 	// floor collision
-	if (!mesh->testRayCollision(model, target, Vector3(0, -1, 0), col_point, col_normal, max_dist)) return;
-	// add colision to list
-	col_normal.normalize();
-	collisions->push_back({ col_point, col_normal });
+	if (mesh->testRayCollision(model, target, Vector3(0, -1, 0), col_point, col_normal, max_dist)) {
+		// add colision to list
+		col_normal.normalize();
+		collisions->push_back({ col_point, col_normal });
+	}
 }
 
 bool World::checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* collisions) {
