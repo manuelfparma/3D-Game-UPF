@@ -130,9 +130,10 @@ EntityArmy::EntityArmy(Mesh* mesh, Texture* texture, Shader* shader, std::vector
 	isDynamic = true;
 	layer = ENEMY;
 	color = SEARCH_COLOR;
-	for (int i = 0; i < this->models.size(); ++i)
+	size = models.size();
+	for (int i = 0; i < size; ++i)
 		stateMachines.push_back(AIBehaviour(&this->models[i], i));
-	marked.resize(models.size(), false);
+	marked.resize(size, false);
 }
 
 
@@ -309,12 +310,9 @@ void EntityArmy::render() {
 	// Get the last camera that was activated 
 	Camera* camera = Camera::current;
 
-	// TODO: color for each indivudual army member?
-	color = onAlert ? FOUND_COLOR : SEARCH_COLOR;
-
 	// Enable shader and pass uniforms 
 	shader->enable();
-	shader->setUniform("u_color", color);
+	shader->setUniform("u_color", Vector4(1.f, 1.f, 1.f, 1.f));
 	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
 	if (texture) shader->setTexture("u_texture", texture, 0);
 
@@ -339,6 +337,10 @@ void EntityArmy::render() {
 	mesh->renderInstanced(GL_TRIANGLES, normal_render.data(), normal_render.size());
 
 	// now we render marked enemies after clearing z-buffer
+	color = onAlert ? FOUND_COLOR : SEARCH_COLOR;
+	shader->setUniform("u_color", color);
+	if (texture) shader->setTexture("u_texture", texture, 0);
+
 	glClear(GL_DEPTH_BUFFER_BIT);
 	mesh->renderInstanced(GL_TRIANGLES, marked_render.data(), marked_render.size());
 

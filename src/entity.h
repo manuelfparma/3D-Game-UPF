@@ -113,6 +113,8 @@ public:
 
 class EntityArmy : public EntityCollider {
 public:
+	int size = 0;
+
 	std::vector<AIBehaviour> stateMachines;
 	std::vector<bool> marked;
 	bool onAlert = false;
