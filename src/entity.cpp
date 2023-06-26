@@ -241,6 +241,26 @@ void EntityPlayer::update(float seconds_elapsed){
 	}
 
 
+	if (Input::wasKeyPressed(SDL_SCANCODE_F) && !invisible) {
+		// invisibility
+		if (stamina >= invisible_cost && invisible_time <= 0) {
+			stamina -= invisible_cost;
+			invisible = true;
+			// activated time
+			invisible_time = INVISIBLE_COOLDOWN;
+		}
+	}
+	else {
+		if (invisible_time > 0)
+			invisible_time -= seconds_elapsed;
+		else if (invisible) {
+			invisible = false;
+			// cooldown time
+			invisible_time = INVISIBLE_COOLDOWN * 2;
+		}
+	}
+
+
 	// check collisions
 	if (world->checkPlayerCollision(position + velocity * seconds_elapsed, &collisions)) {
 		for (const sCollisionData& collision : collisions) {
@@ -306,6 +326,14 @@ void EntityPlayer::render() {
 
 	playerAnimation->update(elapsed_seconds);
 
+	if (invisible) {
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		color = Vector4(1, 1, 1, 0.5);
+	}
+	else
+		color = Vector4(1, 1, 1, 1);
+	
 	shader->enable();
 	shader->setUniform("u_color", color);
 	shader->setUniform("u_texture", texture, 0);
@@ -313,7 +341,8 @@ void EntityPlayer::render() {
 	shader->setUniform("u_model", getGlobalMatrix());
 	mesh->renderAnimated(GL_TRIANGLES, &playerAnimation->getCurrentSkeleton());
 	shader->disable();
-	//EntityMesh::render();
+
+	glDisable(GL_BLEND);
 }
 
 void EntityArmy::update(float seconds_elapsed) {
