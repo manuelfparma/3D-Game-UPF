@@ -141,6 +141,7 @@ void EntityPlayer::onTouchFloor() {
 
 
 void EntityPlayer::update(float seconds_elapsed){
+
 	yaw -= Input::mouse_delta.x * seconds_elapsed * 10.f * DEG2RAD;
 	pitch -= Input::mouse_delta.y * seconds_elapsed * 10.f * DEG2RAD;
 	pitch = clamp(pitch, -M_PI * 0.3f, M_PI * 0.3f);
@@ -162,11 +163,38 @@ void EntityPlayer::update(float seconds_elapsed){
 	bool moving = false;
 
 	float curSpeed = speed;
+
+	int animation_state;
+
 	if (Input::isKeyPressed(SDL_SCANCODE_W)) move_dir += move_front;
 	if (Input::isKeyPressed(SDL_SCANCODE_A)) move_dir += move_right;
 	if (Input::isKeyPressed(SDL_SCANCODE_D)) move_dir -= move_right;
 	if (Input::isKeyPressed(SDL_SCANCODE_S)) move_dir -= move_front;
-	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT))  curSpeed *= crouch_factor;
+	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT)) { 
+		curSpeed *= crouch_factor; 
+
+		if (move_dir.length() < 0.1) {
+			animation_state = NINJA_IDLE_CROUCH;
+		}
+		else {
+			animation_state = NINJA_CROUCH_MOVE;
+		}
+	}
+	else {
+		
+			if (move_dir.length() < 0.1) {
+				animation_state = NINJA_IDLE;
+			}
+			else {
+				if (Input::isKeyPressed(SDL_SCANCODE_S)) {
+					animation_state = NINJA_BACKWARDS;
+				}
+				else {
+				animation_state = NINJA_RUN;
+			}
+			
+		}
+	}
 
 	if (move_dir.x != 0 || move_dir.y != 0 || move_dir.z != 0)
 		moving = true;
@@ -183,6 +211,7 @@ void EntityPlayer::update(float seconds_elapsed){
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_Q)) {
 		// dashing
+		animation_state = NINJA_RUN;
 		if (dashes){
 
 			if (stamina >= dash_cost) {
@@ -196,8 +225,8 @@ void EntityPlayer::update(float seconds_elapsed){
 	}
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
-		playerAnimation->goToState(NINJA_JUMP);
 		// jumping
+		animation_state = NINJA_JUMP;
 		if (jumps) {
 			if (stamina >= jump_cost) {
 
@@ -244,6 +273,7 @@ void EntityPlayer::update(float seconds_elapsed){
 
 	if (!onFloor) {
 		// gravitational pull
+		animation_state = NINJA_FALLING;
 		velocity.y -= gravity_speed * seconds_elapsed;
 	}
 
@@ -260,13 +290,19 @@ void EntityPlayer::update(float seconds_elapsed){
 	if (moving || world->firstPerson)
 		lastYaw = yaw;
 	model.rotate(lastYaw, Vector3(0, 1, 0));
+
+	playerAnimation->goToState(animation_state, 0.0f);
 	// isOnFloor = onFloor;
 
 }
 
 void EntityPlayer::render() {
 
-	playerAnimation->update(0.016f);
+
+	float elapsed_seconds = Game::instance->elapsed_time - game_time;
+	game_time = Game::instance->elapsed_time;
+
+	playerAnimation->update(elapsed_seconds);
 
 	shader->enable();
 	shader->setUniform("u_color", color);

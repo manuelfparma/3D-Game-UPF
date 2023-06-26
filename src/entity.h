@@ -98,7 +98,9 @@ public:
 
 	int dashes;
 	int jumps;
-	
+	float game_time;
+
+
 	// bool isOnFloor = false;
 	float stamina = 100.0f;
 	Vector3 velocity = Vector3(0, 0, 0);
@@ -106,7 +108,7 @@ public:
 	// Model
 	float model_height = 5.f;
 
-	EntityAnimation* playerAnimation = new EntityAnimation();
+	EntityAnimation* playerAnimation = new EntityAnimation(NINJA_ANIMATIONS);
 
 	void onTouchFloor();
 	void update(float seconds_elapsed) override;

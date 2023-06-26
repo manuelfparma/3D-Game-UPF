@@ -1,16 +1,35 @@
 #include "EntityAnimation.h"
 #include "game.h"
 
-EntityAnimation::EntityAnimation() {
-	EntityAnimation::addAnimationState("data/animations/idle.skanim", NINJA_IDLE);
-	EntityAnimation::addAnimationState("data/animations/run.skanim", NINJA_IDLE_CROUCH);
-	EntityAnimation::addAnimationState("data/animations/sneak_walk.skanim", NINJA_RUN);
-	EntityAnimation::addAnimationState("data/animations/sneak_walk.skanim", NINJA_CROUCH_MOVE);
-	EntityAnimation::addAnimationState("data/animations/idle.skanim", NINJA_BACKWARDS);
-	EntityAnimation::addAnimationState("data/animations/jumping_up.skanim", NINJA_JUMP);
-	EntityAnimation::addAnimationState("data/animations/idle.skanim", NINJA_POINT);
+EntityAnimation::EntityAnimation(AnimatedEntities type) {
 
-	current_state = NINJA_IDLE;
+	switch (type)
+	{
+	case NINJA_ANIMATIONS:
+		EntityAnimation::addAnimationState("data/animations/ninja/idle.skanim", NINJA_IDLE);
+		EntityAnimation::addAnimationState("data/animations/ninja/idle_crouch.skanim", NINJA_IDLE_CROUCH);
+		EntityAnimation::addAnimationState("data/animations/ninja/run.skanim", NINJA_RUN);
+		EntityAnimation::addAnimationState("data/animations/ninja/sneak_walk.skanim", NINJA_CROUCH_MOVE);
+		EntityAnimation::addAnimationState("data/animations/ninja/walk_backwards.skanim", NINJA_BACKWARDS);
+		EntityAnimation::addAnimationState("data/animations/ninja/jumping_up.skanim", NINJA_JUMP);
+		EntityAnimation::addAnimationState("data/animations/ninja/pointing.skanim", NINJA_POINT);
+		EntityAnimation::addAnimationState("data/animations/ninja/idle.skanim", NINJA_FALLING);
+		current_state = NINJA_IDLE;
+		break;
+	case ENEMY_ANIMATIONS:
+		EntityAnimation::addAnimationState("data/animations/idle.skanim", ENEMY_PATROL);
+		EntityAnimation::addAnimationState("data/animations/idle.skanim", ENEMY_CHASE);
+		EntityAnimation::addAnimationState("data/animations/idle.skanim", ENEMY_ALERT);
+
+		break;
+	case ARTIFACT_ANIMATIONS:
+		break;
+	default:
+		break;
+	}
+
+	
+
 }
 
 void EntityAnimation::addAnimationState(const char* path, int state) {
