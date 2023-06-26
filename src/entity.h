@@ -95,11 +95,15 @@ public:
 	const float stamina_growth = 10.f;
 	const float dash_cost = 40.f;
 	const float jump_cost = 20.f;
+	const float invisible_cost = 50.f;
 
 	int dashes;
 	int jumps;
 	float game_time;
 
+	const float INVISIBLE_COOLDOWN = 5.f;
+	bool invisible = false;
+	float invisible_time = 0;
 
 	// bool isOnFloor = false;
 	float stamina = 100.0f;

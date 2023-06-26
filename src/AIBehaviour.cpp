@@ -88,6 +88,7 @@ bool AIBehaviour::parseEnemyPath(int i) {
 void AIBehaviour::update(float seconds_elapsed) {
 	World* world = Game::instance->stageManager->currentStage->world;
 	Vector3 player = world->player->model.getTranslation();
+	bool invisible_player = world->player->invisible;
 
 	isMoving = true;
 
@@ -95,7 +96,7 @@ void AIBehaviour::update(float seconds_elapsed) {
 	{
 	case SEARCH_STATE:
 		// check if we can see the player
-		if (world->checkLineOfSight(*mModel, player))
+		if (world->checkLineOfSight(*mModel, player) && !invisible_player)
 			state = FOUND_STATE;
 		// check current path movement and orientation
 		else if (checkPointProximity((*destination)->position)) {
@@ -111,7 +112,7 @@ void AIBehaviour::update(float seconds_elapsed) {
 	case FOUND_STATE:
 		rotateEnemyToNewPoint(player);
 
-		if (world->checkLineOfSight(*mModel, player)) {
+		if (world->checkLineOfSight(*mModel, player) && !invisible_player) {
 			// if we are close to the player, stop moving
 			isMoving = !checkPointProximity(player);
 		}
