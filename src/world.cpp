@@ -118,11 +118,11 @@ void World::render() {
 
 	collectible->render();
 
-	// enemies should be last to render because of z-buffer
-	enemies->render();
-
 	if (freeCam || !firstPerson)
 		player->render();
+
+	// enemies should be last to render because of z-buffer
+	enemies->render();
 
 	if (uiEnabled) {
 		camera2D->enable();
