@@ -13,7 +13,7 @@ EntityAnimation::EntityAnimation(AnimatedEntities type) {
 		EntityAnimation::addAnimationState("data/animations/ninja/walk_backwards.skanim", NINJA_BACKWARDS);
 		EntityAnimation::addAnimationState("data/animations/ninja/jumping_up.skanim", NINJA_JUMP);
 		EntityAnimation::addAnimationState("data/animations/ninja/pointing.skanim", NINJA_POINT);
-		EntityAnimation::addAnimationState("data/animations/ninja/idle.skanim", NINJA_FALLING);
+		EntityAnimation::addAnimationState("data/animations/ninja/falling.skanim", NINJA_FALLING);
 		current_state = NINJA_IDLE;
 		break;
 	case ENEMY_ANIMATIONS:
