@@ -196,6 +196,7 @@ void EntityPlayer::update(float seconds_elapsed){
 	}
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
+		playerAnimation->goToState(NINJA_JUMP);
 		// jumping
 		if (jumps) {
 			if (stamina >= jump_cost) {
@@ -264,15 +265,15 @@ void EntityPlayer::update(float seconds_elapsed){
 }
 
 void EntityPlayer::render() {
-	Animation* anim = Animation::Get("data/animations/sneak_walk.skanim");
-	anim->assignTime(Game::instance->time);
+
+	playerAnimation->update(0.016f);
 
 	shader->enable();
 	shader->setUniform("u_color", color);
 	shader->setUniform("u_texture", texture, 0);
 	shader->setUniform("u_viewprojection", Camera::current->viewprojection_matrix);
 	shader->setUniform("u_model", getGlobalMatrix());
-	mesh->renderAnimated(GL_TRIANGLES, &anim->skeleton);
+	mesh->renderAnimated(GL_TRIANGLES, &playerAnimation->getCurrentSkeleton());
 	shader->disable();
 	//EntityMesh::render();
 }

@@ -1,6 +1,18 @@
 #include "EntityAnimation.h"
 #include "game.h"
 
+EntityAnimation::EntityAnimation() {
+	EntityAnimation::addAnimationState("data/animations/idle.skanim", NINJA_IDLE);
+	EntityAnimation::addAnimationState("data/animations/run.skanim", NINJA_IDLE_CROUCH);
+	EntityAnimation::addAnimationState("data/animations/sneak_walk.skanim", NINJA_RUN);
+	EntityAnimation::addAnimationState("data/animations/sneak_walk.skanim", NINJA_CROUCH_MOVE);
+	EntityAnimation::addAnimationState("data/animations/idle.skanim", NINJA_BACKWARDS);
+	EntityAnimation::addAnimationState("data/animations/jumping_up.skanim", NINJA_JUMP);
+	EntityAnimation::addAnimationState("data/animations/idle.skanim", NINJA_POINT);
+
+	current_state = NINJA_IDLE;
+}
+
 void EntityAnimation::addAnimationState(const char* path, int state) {
 	animation_states[state] = Animation::Get(path);
 }

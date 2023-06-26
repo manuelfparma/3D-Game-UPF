@@ -5,6 +5,7 @@
 #include "texture.h"
 #include "shader.h"
 #include "AIBehaviour.h"
+#include "EntityAnimation.h"
 
 class Entity
 {
@@ -104,6 +105,8 @@ public:
 
 	// Model
 	float model_height = 5.f;
+
+	EntityAnimation* playerAnimation = new EntityAnimation();
 
 	void onTouchFloor();
 	void update(float seconds_elapsed) override;
