@@ -273,7 +273,7 @@ bool World::testCollisionAgainstWorld(Vector3 rayOrigin, Vector3 direction, floa
 
 		if (ec->isInstanced) {
 			// instanced entity
-			for (auto model : ec->models)
+			for (auto& model : ec->models)
 				if (ec->mesh->testRayCollision(model, rayOrigin, direction, Vector3(), Vector3(), distance))
 					return false;
 		}
