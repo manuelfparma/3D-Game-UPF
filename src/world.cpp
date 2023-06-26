@@ -352,7 +352,7 @@ bool World::parseScene(const char* filename)
 
 	// TODO: Shaders and texture should be set up at a .scene level
 	Texture* defaultTexture = Texture::Get("data/texture.tga");
-	Shader* instancedShader = Shader::Get("data/shaders/instanced.vs", "data/shaders/texture.fs");
+	Shader* instancedShader = Shader::Get("data/shaders/instanced.vs", "data/shaders/material.fs");
 	Shader* singleShader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 
 
