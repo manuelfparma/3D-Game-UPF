@@ -1,11 +1,14 @@
 #pragma once
 #include "animation.h"
-enum PlayerStates { PLAYER_IDLE, PLAYER_WALK, PLAYER_RUN, PLAYER_JUMP, PLAYER_CROUCH, PLAYER_DASH, PLAYER_DANCE };
+enum AnimatedEntities {NINJA_ANIMATIONS, ENEMY_ANIMATIONS, ARTIFACT_ANIMATIONS};
+enum NinjaStates { NINJA_IDLE, NINJA_IDLE_CROUCH, NINJA_RUN, NINJA_CROUCH_MOVE, NINJA_BACKWARDS, NINJA_JUMP, NINJA_POINT, NINJA_FALLING};
+enum EnemyStates { ENEMY_PATROL, ENEMY_CHASE, ENEMY_ALERT};
+enum ArtifactStates { IDLE, PICKED_UP };
 
 class EntityAnimation
 {
 public:
-	EntityAnimation();
+	EntityAnimation(AnimatedEntities type);
 	void update(float seconds_elapsed);
 	void addAnimationState(const char* path, int state);
 	void goToState(int state, float time = 0.f);

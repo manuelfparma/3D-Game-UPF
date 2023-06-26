@@ -157,7 +157,7 @@ void World::update(double seconds_elapsed) {
 	}
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_E)) {
-
+		// player->playerAnimation->goToState(NINJA_POINT, 2.f);
 		if (checkCollectiblePickup()) {
 			Game::instance->stageManager->changeStage(OUTRO_STAGE, 1);
 		}
