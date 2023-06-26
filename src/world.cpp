@@ -6,6 +6,7 @@
 #include "stage.h"
 #include <fstream>
 #include <map>
+#include <regex>
 
 //some globals
 Animation* anim = NULL;
@@ -402,7 +403,14 @@ bool World::parseScene(const char* filename)
 		// Create instanced entity
 		if (render_data.models.size() > 1) {
 
-			EntityCollider* new_entity = new EntityCollider(Mesh::Get(mesh_name.c_str()), defaultTexture, instancedShader, render_data.models);
+			EntityCollider* new_entity;
+			if (std::regex_match(mesh_name.c_str(), std::regex("data/meshes/House(1|2|3)\\.obj"))) {
+				new_entity = new EntityCollider(Mesh::Get(mesh_name.c_str()), Texture::Get("data/textures/house.tga"), Shader::Get("data/shaders/instanced.vs", "data/shaders/texture.fs"), render_data.models);
+			}
+			else {
+				new_entity = new EntityCollider(Mesh::Get(mesh_name.c_str()), defaultTexture, instancedShader, render_data.models);
+			}
+
 			// Add entity to scene root
 			root->addChild(new_entity);
 		}

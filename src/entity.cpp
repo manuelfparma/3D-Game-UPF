@@ -246,6 +246,7 @@ void EntityPlayer::update(float seconds_elapsed){
 		if (stamina >= invisible_cost && invisible_time <= 0) {
 			stamina -= invisible_cost;
 			invisible = true;
+			texture = Texture::getWhiteTexture();
 			// activated time
 			invisible_time = INVISIBLE_COOLDOWN;
 		}
@@ -255,6 +256,7 @@ void EntityPlayer::update(float seconds_elapsed){
 			invisible_time -= seconds_elapsed;
 		else if (invisible) {
 			invisible = false;
+			texture = Texture::Get("data/textures/ninja_texture.tga");
 			// cooldown time
 			invisible_time = INVISIBLE_COOLDOWN * 2;
 		}
@@ -315,7 +317,6 @@ void EntityPlayer::update(float seconds_elapsed){
 
 	playerAnimation->goToState(animation_state, 0.0f);
 	// isOnFloor = onFloor;
-
 }
 
 void EntityPlayer::render() {
