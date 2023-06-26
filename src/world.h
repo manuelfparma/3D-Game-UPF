@@ -45,8 +45,10 @@ public:
 	void updateCamera(double seconds_elapsed);
 	bool checkPlayerCollision(Vector3 target, std::vector<sCollisionData>* collisions);
 	void checkCameraCollision(Vector3& target);
+	bool testCollisionAgainstWorld(Vector3 rayOrigin, Vector3 direction, float distance);
 	bool checkLineOfSight(Matrix44& obs, Vector3 target);
 	bool checkCollectiblePickup();
+	void checkEnemyMarking();
 	void onResize(int width, int height);
 private:
 	void createSkybox();

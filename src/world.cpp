@@ -66,9 +66,9 @@ void World::createEnemies() {
 	models.resize(ENEMY_COUNT);
 
 	enemies = new EntityArmy(
-		Mesh::Get("data/models/samurai.obj"),
-		nullptr,
-		Shader::Get("data/shaders/instanced.vs", "data/shaders/material.fs"),
+		Mesh::Get("data/models/new_samurai.obj"),
+		Texture::Get("data/textures/new-samurai-texture.tga"),
+		Shader::Get("data/shaders/instanced.vs", "data/shaders/texture.fs"),
 		models
 	);
 }
@@ -121,6 +121,7 @@ void World::render() {
 
 	collectible->render();
 
+	// enemies should be last to render because of z-buffer
 	enemies->render();
 
 	if (uiEnabled) {
@@ -159,6 +160,9 @@ void World::update(double seconds_elapsed) {
 
 		if (checkCollectiblePickup()) {
 			Game::instance->stageManager->changeStage(OUTRO_STAGE, 1);
+		}
+		else {
+			checkEnemyMarking();
 		}
 	}
 
@@ -259,6 +263,28 @@ void World::checkCameraCollision(Vector3& target) {
 	}
 }
 
+// return true if there are no collision with the static world in the direction and distance specified
+bool World::testCollisionAgainstWorld(Vector3 rayOrigin, Vector3 direction, float distance) {
+	for (auto e : root->children)
+	{
+		EntityCollider* ec = dynamic_cast<EntityCollider*>(e);
+
+		if (!ec || ec->isDynamic) continue;
+
+		if (ec->isInstanced) {
+			// instanced entity
+			for (auto model : ec->models)
+				if (ec->mesh->testRayCollision(model, rayOrigin, direction, Vector3(), Vector3(), distance))
+					return false;
+		}
+		// not instanced entity
+		else if (ec->mesh->testRayCollision(ec->model, rayOrigin, direction, Vector3(), Vector3(), distance))
+			return false;
+	}
+
+	return true;
+}
+
 bool World::checkLineOfSight(Matrix44& obs, Vector3 target) {
 	Vector3 front = obs.frontVector();
 	Vector3 toTarget = target - obs.getTranslation();
@@ -274,24 +300,7 @@ bool World::checkLineOfSight(Matrix44& obs, Vector3 target) {
 
 	if (direction.dot(front) > 0.5)
 	{
-		for (auto e : root->children)
-		{
-			EntityCollider* ec = dynamic_cast<EntityCollider*>(e);
-
-			if (!ec || ec->isDynamic) continue;
-
-			if (ec->isInstanced) {
-				// instanced entity
-				for (auto model : ec->models)
-					if (ec->mesh->testRayCollision(model, rayOrigin, direction, Vector3(), Vector3(), distance))
-						return false;
-			}
-			// not instanced entity
-			else if (ec->mesh->testRayCollision(ec->model, rayOrigin, direction, Vector3(), Vector3(), distance))
-				return false;
-		}
-
-		return true;
+		return testCollisionAgainstWorld(rayOrigin, direction, distance);
 	}
 
 	return false;
@@ -312,6 +321,28 @@ bool World::checkCollectiblePickup() {
 
 	return false;
 };
+
+void World::checkEnemyMarking() {
+	Vector3 cameraDirection = normalize(camera->center - camera->eye);
+	Vector3 rayOrigin = camera->eye;
+	float max_dist;
+
+	// check if player is looking at an enemy
+	for (int i = 0; i < enemies->size; i++) {
+		max_dist = (player->model.getTranslation() - enemies->models[i].getTranslation()).length();
+
+		if (enemies->mesh->testRayCollision(enemies->models[i], rayOrigin, 
+			cameraDirection, Vector3(), Vector3(), max_dist)) {
+			// the player is looking in the direction of an enemy
+			// but there might be world objects in between
+			if (testCollisionAgainstWorld(rayOrigin, cameraDirection, max_dist)) {
+				// there is nothing in between, so we mark the enemy
+				enemies->marked[i] = true;
+				break;		//	only one enemy can be marked at the time
+			}
+		}
+	}
+}
 
 bool World::parseScene(const char* filename)
 {
