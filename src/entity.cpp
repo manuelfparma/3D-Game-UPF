@@ -134,6 +134,7 @@ EntityArmy::EntityArmy(Mesh* mesh, Texture* texture, Shader* shader, std::vector
 	for (int i = 0; i < size; ++i)
 		stateMachines.push_back(AIBehaviour(&this->models[i], i));
 	marked.resize(size, false);
+	marching_sound = Audio::Get("marching");
 }
 
 
@@ -235,8 +236,7 @@ void EntityPlayer::update(float seconds_elapsed){
 				stamina -= dash_cost;
 				velocity += move_front * dash_speed;
 				dashes-=1;
-				Audio::SetListener(position);
-				Audio::Play3D("dash", position);
+				Audio::Play("dash");
 			}
 		}
 	}
@@ -250,8 +250,7 @@ void EntityPlayer::update(float seconds_elapsed){
 				stamina -= jump_cost;
 				velocity.y = jump_speed;
 				jumps -= 1;
-				Audio::SetListener(position);
-				Audio::Play3D("jump", position);
+				Audio::Play("jump");
 			}
 		}
 	}
@@ -265,9 +264,7 @@ void EntityPlayer::update(float seconds_elapsed){
 			texture = Texture::getWhiteTexture();
 			// activated time
 			invisible_time = INVISIBLE_COOLDOWN;
-			// update listener position according to camera
-			Audio::SetListener(position);
-			Audio::Play3D("sneak", position);
+			Audio::Play("sneak");
 		}
 	}
 	else {
@@ -381,6 +378,9 @@ void EntityPlayer::render() {
 void EntityArmy::update(float seconds_elapsed) {
 	bool playerSeen = false;
 	int animation_state;
+	float closest_to_player = 99999999.f;
+	Vector3 player = Game::getPlayerPosition();
+
 	for (int i = 0; i < models.size(); ++i){
 		// get model matrix of current enemy
 		Matrix44* mModel = &models[i];
@@ -392,8 +392,24 @@ void EntityArmy::update(float seconds_elapsed) {
 			animation_state = ENEMY_CHASE;
 		}
 		// move enemy (state machine updates orientation)
-		if (stateMachines[i].isMoving && !(playerSeen && !onAlert))
+		if (stateMachines[i].isMoving && !(playerSeen && !onAlert)) {
 			mModel->translate(0, 0, moveSpeed * seconds_elapsed);
+
+			float dist = (mModel->getTranslation() - player).length();
+
+			if (dist < closest_to_player) {
+				closest_to_player = dist;
+			}
+
+		}
+	}
+
+	if (!(playerSeen && !onAlert)) {
+		// we colud not make 3D audio work
+		marching_sound->play(clamp(1 - (closest_to_player / 50), 0.0, 0.8));
+	}
+	else {
+		marching_sound->pause();
 	}
 
 	if (playerSeen) {

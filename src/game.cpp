@@ -159,3 +159,7 @@ void Game::onResize(int width, int height)
 	window_width = width;
 	window_height = height;
 }
+
+Vector3 Game::getPlayerPosition() {
+	return instance->stageManager->currentStage->world->player->model.getTranslation();
+}

@@ -41,5 +41,6 @@ public:
 	static bool Stop(HCHANNEL channel);
 	// Set position of listener
 	static bool SetListener(Vector3 position);
+	static void SetSoundPosition(Audio* audio, Vector3 position);
 };
 

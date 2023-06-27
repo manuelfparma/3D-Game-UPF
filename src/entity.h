@@ -134,6 +134,8 @@ public:
 	float seenCooldown = ATTENTION_TIME;
 	EntityAnimation* armyAnimation = new EntityAnimation(ENEMY_ANIMATIONS);
 
+	Audio* marching_sound;
+
 	void update(float seconds_elapsed);
 	void render() override;
 
