@@ -6,6 +6,7 @@
 #include "stage.h"
 #include <iostream>
 #include "animation.h"
+#include "EntityAnimation.h"
 
 Matrix44 Entity::getGlobalMatrix()
 {
@@ -243,28 +244,30 @@ void EntityPlayer::update(float seconds_elapsed){
 	// dashing and jumping are not available in certain cases
 	if (!landlocked) {
 
-	if (Input::wasKeyPressed(SDL_SCANCODE_Q)) {
-		// dashing
-		if (dashes){
+		if (Input::wasKeyPressed(SDL_SCANCODE_Q)) {
+			// dashing
+			if (dashes) {
 
-			if (stamina >= dash_cost) {
-				animation_state = NINJA_FRONT;
-				stamina -= dash_cost;
-				velocity += move_front * dash_speed;
-				dashes-=1;
-				Audio::Play("dash");
+				if (stamina >= dash_cost) {
+					animation_state = NINJA_FRONT;
+					stamina -= dash_cost;
+					velocity += move_front * dash_speed;
+					dashes -= 1;
+					Audio::Play("dash");
+				}
 			}
 		}
 
-	if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
-		// jumping
-		if (jumps) {
-			if (stamina >= jump_cost) {
-				animation_state = NINJA_JUMP;
-				stamina -= jump_cost;
-				velocity.y = jump_speed;
-				jumps -= 1;
-				Audio::Play("jump");
+		if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
+			// jumping
+			if (jumps) {
+				if (stamina >= jump_cost) {
+					animation_state = NINJA_JUMP;
+					stamina -= jump_cost;
+					velocity.y = jump_speed;
+					jumps -= 1;
+					Audio::Play("jump");
+				}
 			}
 		}
 	}
