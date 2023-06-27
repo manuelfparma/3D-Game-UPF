@@ -6,6 +6,7 @@
 #define SOUNDS_N 3
 
 SoundFile SOUNDS[SOUNDS_N] = {
+	// {name, path, loop, spatial}
 	{"music", "data/sounds/background-music.wav", true, false},
 	{"jump", "data/sounds/jump.wav", false, true},
 	{"sneak", "data/sounds/sneak.wav", false, true}
@@ -17,9 +18,11 @@ std::map<std::string, Audio*> Audio::sAudiosLoaded;
 Audio::Audio(SoundFile soundfile) {
 	DWORD flags = 0;
 	if (soundfile.loop)
-		CHECK_FLAGS(flags, BASS_SAMPLE_LOOP);
+		flags = CHECK_FLAGS(flags, BASS_SAMPLE_LOOP);
 	if (soundfile.spatial)
-		CHECK_FLAGS(flags, BASS_SAMPLE_3D);
+		flags = CHECK_FLAGS(flags, BASS_SAMPLE_3D);
+
+	std::cout << " + Sound File Loading: " << soundfile.path << std::endl;
 
 	// flags: BASS_SAMPLE_LOOP, BASS_SAMPLE_3D, ...
 	hSample = BASS_SampleLoad(
@@ -100,11 +103,9 @@ bool Audio::Stop(HCHANNEL channel) {
 	return BASS_ChannelStop(channel);
 }
 
-bool Audio::SetListener(Vector3 position, Vector3 front, Vector3 top) {
-	BASS_3DVECTOR bass_position(position.x, position.y, position.z),
-		bass_front(front.x, front.y, front.z),
-		bass_top(top.x, top.y, top.z);
-	bool result = BASS_Set3DPosition(&bass_position, NULL, &bass_front, &bass_top);
+bool Audio::SetListener(Vector3 position) {
+	BASS_3DVECTOR bass_position(position.x, position.y, position.z);
+	bool result = BASS_Set3DPosition(&bass_position, NULL, NULL, NULL);
 	// Apply changes to 3D system
 	BASS_Apply3D();
 	return result;

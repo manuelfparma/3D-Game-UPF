@@ -38,6 +38,6 @@ public:
 	// Stop sounds
 	static bool Stop(HCHANNEL channel);
 	// Set position of listener
-	static bool SetListener(Vector3 position, Vector3 front, Vector3 top);
+	static bool SetListener(Vector3 position);
 };
 

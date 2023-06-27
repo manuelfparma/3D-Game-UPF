@@ -235,6 +235,7 @@ void EntityPlayer::update(float seconds_elapsed){
 				stamina -= jump_cost;
 				velocity.y = jump_speed;
 				jumps -= 1;
+				Audio::SetListener(position);
 				Audio::Play3D("jump", position);
 			}
 		}
@@ -248,6 +249,8 @@ void EntityPlayer::update(float seconds_elapsed){
 			invisible = true;
 			// activated time
 			invisible_time = INVISIBLE_COOLDOWN;
+			// update listener position according to camera
+			Audio::SetListener(position);
 			Audio::Play3D("sneak", position);
 		}
 	}

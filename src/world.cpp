@@ -137,9 +137,6 @@ void World::render() {
 }
 
 void World::update(double seconds_elapsed) {
-	// update listener position according to camera
-	Audio::SetListener(camera->eye, camera->center, camera->up);
-	
 	// pause the game if free camera is activated
 	if (!freeCam) {
 		player->update(seconds_elapsed);
