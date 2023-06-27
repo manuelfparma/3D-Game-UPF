@@ -122,9 +122,6 @@ void World::render() {
 	}
 
     root->render(); 
-	//Draw the floor grid
-	drawGrid();
-
 	collectible->render();
 
 	if (freeCam || !firstPerson)
@@ -372,7 +369,7 @@ bool World::parseScene(const char* filename)
 	}
 
 	// TODO: Shaders and texture should be set up at a .scene level
-	Texture* defaultTexture = Texture::Get("data/texture.tga");
+	Texture* defaultTexture = Texture::Get("data/textures/floor.tga");
 	Shader* instancedShader = Shader::Get("data/shaders/instanced.vs", "data/shaders/material.fs");
 	Shader* singleShader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 
