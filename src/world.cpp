@@ -38,6 +38,10 @@ World::World(const char* sceneFilename) {
 
 	// open scene
 	parseScene(sceneFilename);
+
+	// play background music
+	Audio* music = Audio::Get("music");
+	bgMusic = music->play(0.5);
 }
 
 void World::createSkybox() {
@@ -133,6 +137,9 @@ void World::render() {
 }
 
 void World::update(double seconds_elapsed) {
+	// update listener position according to camera
+	Audio::SetListener(camera->eye, camera->center, camera->up);
+	
 	// pause the game if free camera is activated
 	if (!freeCam) {
 		player->update(seconds_elapsed);

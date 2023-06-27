@@ -76,6 +76,7 @@
     <ClCompile Include="..\..\src\AIBehaviour.cpp" />
     <ClCompile Include="..\..\src\ui.cpp" />
     <ClCompile Include="..\..\src\EntityAnimation.cpp" />
+    <ClCompile Include="..\..\src\sound.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\camera.h" />
@@ -167,6 +168,7 @@
     </ClInclude>
     <ClInclude Include="..\..\src\ui.h" />
     <ClInclude Include="..\..\src\EntityAnimation.h" />
+    <ClInclude Include="..\..\src\sound.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="extra">

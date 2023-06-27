@@ -7,6 +7,7 @@
 #include "input.h"
 #include "entity.h"
 #include "stage.h"
+#include "sound.h"
 
 #include <cmath>
 
@@ -31,7 +32,8 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	glEnable( GL_CULL_FACE ); //render both sides of every triangle
 	glEnable( GL_DEPTH_TEST ); //check the occlusions using the Z buffer
 
-	// load ambulance mesh
+	// initialize stage and audio manager
+	Audio::Init();	// this first because stages used sounds
 	stageManager = new StageManager();
 
 	/*
