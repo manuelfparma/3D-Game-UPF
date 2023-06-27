@@ -142,6 +142,14 @@ void EntityPlayer::onTouchFloor() {
 	dashes = max_dashes;
 }
 
+void EntityPlayer::loseLife() {
+	if (damage_cooldown > 0)
+		return;
+	lives--;
+	damage_cooldown = DAMAGED_TIME;
+	std::cout << "LIFE LOST! Remaining: " << lives << std::endl;
+}
+
 
 void EntityPlayer::update(float seconds_elapsed){
 
@@ -349,7 +357,9 @@ void EntityPlayer::update(float seconds_elapsed){
 	model.rotate(lastYaw, Vector3(0, 1, 0));
 
 	playerAnimation->goToState(animation_state, 0.0f);
-	// isOnFloor = onFloor;
+
+	// invincibility cooldown
+	damage_cooldown = max(damage_cooldown - seconds_elapsed, 0.f);
 }
 
 void EntityPlayer::render() {

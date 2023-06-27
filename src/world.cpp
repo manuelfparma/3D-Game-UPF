@@ -151,6 +151,11 @@ void World::update(double seconds_elapsed) {
 		updateCamera(seconds_elapsed);
 	}
 
+	// check if the game is lost
+	if (player->lives <= 0) {
+		Game::instance->stageManager->changeStage(OUTRO_STAGE, 0);
+	}
+
     //to navigate with the mouse fixed in the middle
     if (Game::instance->mouse_locked)
         Input::centerMouse();
