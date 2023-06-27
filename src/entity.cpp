@@ -108,8 +108,6 @@ EntityCollider::EntityCollider(bool isDynamic, COLISSION_LAYER layer) {
 }
 
 EntityPlayer::EntityPlayer() : EntityCollider(true, PLAYER) {
-
-
 	dashes = max_dashes;
 	jumps = max_jumps;
 
@@ -121,6 +119,9 @@ EntityPlayer::EntityPlayer() : EntityCollider(true, PLAYER) {
 	mesh = Mesh::Get("data/models/ninja_reuv.MESH");
 	texture = Texture::Get("data/textures/ninja_texture.tga");
 	shader = Shader::Get("data/shaders/skinning.vs", "data/shaders/texture.fs");
+
+	walking_sound = Audio::Get("walk");
+	slow_walking = Audio::Get("slow");
 }
 
 EntityArmy::EntityArmy(Mesh* mesh, Texture* texture, Shader* shader, std::vector<Matrix44> models)
@@ -133,6 +134,7 @@ EntityArmy::EntityArmy(Mesh* mesh, Texture* texture, Shader* shader, std::vector
 	for (int i = 0; i < size; ++i)
 		stateMachines.push_back(AIBehaviour(&this->models[i], i));
 	marked.resize(size, false);
+	marching_sound = Audio::Get("marching");
 }
 
 
@@ -171,8 +173,15 @@ void EntityPlayer::update(float seconds_elapsed){
 	if (Input::isKeyPressed(SDL_SCANCODE_A)) move_dir += move_right;
 	if (Input::isKeyPressed(SDL_SCANCODE_D)) move_dir -= move_right;
 	if (Input::isKeyPressed(SDL_SCANCODE_S)) move_dir -= move_front;
+
 	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT)) { 
+		if (!crouching && sound_playing) {
+			walking_sound->pause();
+			sound_playing = false;
+		}
+
 		curSpeed *= crouch_factor; 
+		crouching = true;
 
 		if (move_dir.length() < 0.1) {
 			animation_state = NINJA_IDLE_CROUCH;
@@ -182,23 +191,30 @@ void EntityPlayer::update(float seconds_elapsed){
 		}
 	}
 	else {
-		
-			if (move_dir.length() < 0.1) {
-				animation_state = NINJA_IDLE;
+		if (crouching && sound_playing) {
+			slow_walking->pause();
+			sound_playing = false;
+		}
+
+		crouching = false;
+
+		if (move_dir.length() < 0.1) {
+			animation_state = NINJA_IDLE;
+		}
+		else {
+			if (Input::isKeyPressed(SDL_SCANCODE_S)) {
+				animation_state = NINJA_BACKWARDS;
 			}
 			else {
-				if (Input::isKeyPressed(SDL_SCANCODE_S)) {
-					animation_state = NINJA_BACKWARDS;
-				}
-				else {
-				animation_state = NINJA_RUN;
-			}
+			animation_state = NINJA_RUN;
+		}
 			
 		}
 	}
 
-	if (move_dir.x != 0 || move_dir.y != 0 || move_dir.z != 0)
+	if (move_dir.length() > 0) {
 		moving = true;
+	}
 
 	if (move_dir.length() > 0.01) move_dir.normalize();
 	velocity += move_dir * curSpeed;
@@ -220,7 +236,7 @@ void EntityPlayer::update(float seconds_elapsed){
 				stamina -= dash_cost;
 				velocity += move_front * dash_speed;
 				dashes-=1;
-
+				Audio::Play("dash");
 			}
 		}
 	}
@@ -234,8 +250,7 @@ void EntityPlayer::update(float seconds_elapsed){
 				stamina -= jump_cost;
 				velocity.y = jump_speed;
 				jumps -= 1;
-				Audio::SetListener(position);
-				Audio::Play3D("jump", position);
+				Audio::Play("jump");
 			}
 		}
 	}
@@ -249,9 +264,7 @@ void EntityPlayer::update(float seconds_elapsed){
 			texture = Texture::getWhiteTexture();
 			// activated time
 			invisible_time = INVISIBLE_COOLDOWN;
-			// update listener position according to camera
-			Audio::SetListener(position);
-			Audio::Play3D("sneak", position);
+			Audio::Play("sneak");
 		}
 	}
 	else {
@@ -274,6 +287,8 @@ void EntityPlayer::update(float seconds_elapsed){
 
 			if (up_factor > 0.8) {
 				
+				position.y = collision.colPoint.y - 0.05;
+
 				onFloor = true;
 				dashes = max_dashes;
 				jumps = max_jumps;
@@ -304,11 +319,26 @@ void EntityPlayer::update(float seconds_elapsed){
 		velocity.y -= gravity_speed * seconds_elapsed;
 	}
 
+	Vector3 aux(move_dir.x, 0, move_dir.y);
+	if (onFloor && aux.length() > 0) {
+		if (!sound_playing) {
+			if (crouching)
+				slow_walking->play(1.0);
+			else
+				walking_sound->play(1.0);
+			sound_playing = true;
+		}
+	}
+	else if (sound_playing) {
+		walking_sound->pause();
+		slow_walking->pause();
+		sound_playing = false;
+	}
 
 	position += velocity * seconds_elapsed;
 	// floor friction
-	velocity.x *= pow(floor_friction, seconds_elapsed);
-	velocity.z *= pow(floor_friction, seconds_elapsed);
+	velocity.x *= floor_friction;
+	velocity.z *= floor_friction;
 
 	// stamina regen
 	stamina = clamp(stamina + stamina_growth * seconds_elapsed, 0, 100);
@@ -348,6 +378,9 @@ void EntityPlayer::render() {
 void EntityArmy::update(float seconds_elapsed) {
 	bool playerSeen = false;
 	int animation_state;
+	float closest_to_player = 99999999.f;
+	Vector3 player = Game::getPlayerPosition();
+
 	for (int i = 0; i < models.size(); ++i){
 		// get model matrix of current enemy
 		Matrix44* mModel = &models[i];
@@ -359,8 +392,24 @@ void EntityArmy::update(float seconds_elapsed) {
 			animation_state = ENEMY_CHASE;
 		}
 		// move enemy (state machine updates orientation)
-		if (stateMachines[i].isMoving)
+		if (stateMachines[i].isMoving && !(playerSeen && !onAlert)) {
 			mModel->translate(0, 0, moveSpeed * seconds_elapsed);
+
+			float dist = (mModel->getTranslation() - player).length();
+
+			if (dist < closest_to_player) {
+				closest_to_player = dist;
+			}
+
+		}
+	}
+
+	if (!(playerSeen && !onAlert)) {
+		// we colud not make 3D audio work
+		marching_sound->play(clamp(1 - (closest_to_player / 50), 0.0, 0.8));
+	}
+	else {
+		marching_sound->pause();
 	}
 
 	if (playerSeen) {

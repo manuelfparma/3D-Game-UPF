@@ -23,6 +23,8 @@ public:
 
 	// Play audio and return the channel
 	HCHANNEL play(float volume);
+	bool pause();
+	bool stop();
 
 	// Manager stuff
 	// The map!
@@ -39,5 +41,6 @@ public:
 	static bool Stop(HCHANNEL channel);
 	// Set position of listener
 	static bool SetListener(Vector3 position);
+	static void SetSoundPosition(Audio* audio, Vector3 position);
 };
 

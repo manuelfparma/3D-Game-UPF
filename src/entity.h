@@ -6,6 +6,7 @@
 #include "shader.h"
 #include "AIBehaviour.h"
 #include "EntityAnimation.h"
+#include "sound.h"
 
 class Entity
 {
@@ -89,8 +90,11 @@ public:
 	const int max_jumps = 1;
 	const float dash_speed = 200.0f;
 	const float gravity_speed = 150.f;
-	const float floor_friction = 0.001f;
+	const float floor_friction = 0.96f;
+	bool crouching = false;
 
+	Audio *walking_sound, *slow_walking;
+	bool sound_playing = false;
 
 	const float stamina_growth = 10.f;
 	const float dash_cost = 40.f;
@@ -129,6 +133,8 @@ public:
 	bool onAlert = false;
 	float seenCooldown = ATTENTION_TIME;
 	EntityAnimation* armyAnimation = new EntityAnimation(ENEMY_ANIMATIONS);
+
+	Audio* marching_sound;
 
 	void update(float seconds_elapsed);
 	void render() override;

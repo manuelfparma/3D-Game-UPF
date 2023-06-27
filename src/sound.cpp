@@ -3,13 +3,18 @@
 
 #define CHECK_FLAGS(F, NEW_F) ((F) == 0 ? (NEW_F) : (F) & (NEW_F))
 
-#define SOUNDS_N 3
+#define SOUNDS_N 8
 
 SoundFile SOUNDS[SOUNDS_N] = {
 	// {name, path, loop, spatial}
 	{"music", "data/sounds/background-music.wav", true, false},
-	{"jump", "data/sounds/jump.wav", false, true},
-	{"sneak", "data/sounds/sneak.wav", false, true}
+	{"jump", "data/sounds/jump.wav", false, false},
+	{"sneak", "data/sounds/sneak.wav", false, false},
+	{"dash", "data/sounds/dash.wav", false, false},
+	{"walk", "data/sounds/walking.wav", true, false},
+	{"slow", "data/sounds/slow_walking.wav", true, false},
+	{"marching", "data/sounds/marching.wav", true, false},
+	{"alarm", "data/sounds/alarm.wav", false, false}
 };
 
 // without the redefinition below, the linker does not work
@@ -30,7 +35,7 @@ Audio::Audio(SoundFile soundfile) {
 		soundfile.path.c_str(), 	// Filepath
 		0,							// Offset
 		0,							// Length
-		1,							// Max playbacks
+		10,							// Max playbacks
 		flags 						// Flags
 	);
 
@@ -51,8 +56,16 @@ Audio::~Audio() {
 
 HCHANNEL Audio::play(float volume) {
 	BASS_ChannelSetAttribute(hSampleChannel, BASS_ATTRIB_VOL, volume);
-	BASS_ChannelPlay(hSampleChannel, true);
+	BASS_ChannelPlay(hSampleChannel, false);
 	return hSampleChannel;
+}
+
+bool Audio::pause() {
+	return BASS_ChannelPause(hSampleChannel);
+}
+
+bool Audio::stop() {
+	return Stop(hSampleChannel);
 }
 
 bool Audio::Init() {
@@ -88,12 +101,7 @@ HCHANNEL Audio::Play3D(const char* name, Vector3 position) {
 	Audio* audio = Get(name);
 	if (audio == nullptr) return 0;
 
-	// Set audio position in space
-	BASS_3DVECTOR bass_position(position.x, position.y, position.z);
-	BASS_ChannelSet3DPosition(audio->hSampleChannel, &bass_position, NULL, NULL);
-
-	// Apply changes to 3D system
-	BASS_Apply3D();
+	SetSoundPosition(audio, position);
 
 	// Play sample
 	return audio->play(1.0);
@@ -109,4 +117,13 @@ bool Audio::SetListener(Vector3 position) {
 	// Apply changes to 3D system
 	BASS_Apply3D();
 	return result;
+}
+
+void Audio::SetSoundPosition(Audio* audio, Vector3 position) {
+	// Set audio position in space
+	BASS_3DVECTOR bass_position(position.x, position.y, position.z);
+	BASS_ChannelSet3DPosition(audio->hSampleChannel, &bass_position, NULL, NULL);
+
+	// Apply changes to 3D system
+	BASS_Apply3D();
 }

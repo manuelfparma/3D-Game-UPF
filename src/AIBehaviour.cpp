@@ -3,6 +3,7 @@
 #include "world.h"
 #include "stage.h"
 #include "extra/pathfinder/PathFinder.h"
+#include "sound.h"
 #include <fstream>
 
 void WayPoint::addLink(WayPoint* other, float distance) {
@@ -96,8 +97,10 @@ void AIBehaviour::update(float seconds_elapsed) {
 	{
 	case SEARCH_STATE:
 		// check if we can see the player
-		if (world->checkLineOfSight(*mModel, player) && !invisible_player)
+		if (checkLineOfSight() && !invisible_player) {
+			Audio::Play("alarm");
 			state = FOUND_STATE;
+		}
 		// check current path movement and orientation
 		else if (checkPointProximity((*destination)->position)) {
 			++destination;
@@ -112,7 +115,7 @@ void AIBehaviour::update(float seconds_elapsed) {
 	case FOUND_STATE:
 		rotateEnemyToNewPoint(player);
 
-		if (world->checkLineOfSight(*mModel, player) && !invisible_player) {
+		if (checkLineOfSight() && !invisible_player) {
 			// if we are close to the player, stop moving
 			isMoving = !checkPointProximity(player);
 		}
@@ -129,6 +132,33 @@ void AIBehaviour::update(float seconds_elapsed) {
 		isMoving = false;
 		break;
 	}
+}
+
+bool AIBehaviour::checkLineOfSight() {
+	World* world = Game::instance->stageManager->currentStage->world;
+
+	Vector3 player = world->player->model.getTranslation();
+	Vector3 front = mModel->frontVector();
+	Vector3 toTarget = player - mModel->getTranslation();
+
+	float distance = toTarget.length();
+	float maxDist = world->MAX_VIEW_DISTANCE;
+	// if the player is crouching, the enemy has to be closer to see him
+	maxDist /= world->player->crouching ? 2.0 : 1.0;
+
+	if (distance > maxDist)
+		return false;
+
+	Vector3 rayOrigin = mModel->getTranslation();
+	rayOrigin.y += world->player->model_height;
+	Vector3 direction = normalize(toTarget);
+
+	if (direction.dot(front) > 0.5)
+	{
+		return world->testCollisionAgainstWorld(rayOrigin, direction, distance);
+	}
+
+	return false;
 }
 
 bool AIBehaviour::checkPointProximity(Vector3 point) {
