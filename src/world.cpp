@@ -39,6 +39,10 @@ World::World(const char* sceneFilename) {
 
 	// open scene
 	parseScene(sceneFilename);
+
+	// play background music
+	Audio* music = Audio::Get("music");
+	bgMusic = music->play(0.5);
 }
 
 void World::createSkybox() {

@@ -4,6 +4,7 @@
 #include "texture.h"
 #include "game.h"
 #include "ui.h"
+#include "sound.h"
 
 struct sRenderData {
 	Texture* texture = nullptr;
@@ -32,6 +33,7 @@ public:
 	bool uiEnabled = true;
 	UI* ui;
 	std::map<std::string, sRenderData> meshes_to_load;
+	HCHANNEL bgMusic;
 
 	// stats
 	int ENEMY_COUNT = 5;
