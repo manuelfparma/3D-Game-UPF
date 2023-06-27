@@ -276,6 +276,8 @@ void EntityPlayer::update(float seconds_elapsed){
 
 			if (up_factor > 0.8) {
 				
+				position.y = collision.colPoint.y - 0.05;
+
 				onFloor = true;
 				dashes = max_dashes;
 				jumps = max_jumps;
