@@ -34,6 +34,7 @@ private:
 	// constants
 	float EPSILON = 1.f;
 
+	bool checkLineOfSight();
 	bool checkPointProximity(Vector3 point);
 	void rotateEnemyToNewPoint(Vector3 point);
 	bool parseEnemyPath(int i);

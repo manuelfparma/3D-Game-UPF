@@ -171,8 +171,10 @@ void EntityPlayer::update(float seconds_elapsed){
 	if (Input::isKeyPressed(SDL_SCANCODE_A)) move_dir += move_right;
 	if (Input::isKeyPressed(SDL_SCANCODE_D)) move_dir -= move_right;
 	if (Input::isKeyPressed(SDL_SCANCODE_S)) move_dir -= move_front;
+	crouching = false;
 	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT)) { 
 		curSpeed *= crouch_factor; 
+		crouching = true;
 
 		if (move_dir.length() < 0.1) {
 			animation_state = NINJA_IDLE_CROUCH;

@@ -296,27 +296,6 @@ bool World::testCollisionAgainstWorld(Vector3 rayOrigin, Vector3 direction, floa
 	return true;
 }
 
-bool World::checkLineOfSight(Matrix44& obs, Vector3 target) {
-	Vector3 front = obs.frontVector();
-	Vector3 toTarget = target - obs.getTranslation();
-
-	float distance = toTarget.length();
-
-	if (distance > MAX_VIEW_DISTANCE)
-		return false;
-
-	Vector3 rayOrigin = obs.getTranslation();
-	rayOrigin.y += player->model_height;
-	Vector3 direction = normalize(toTarget);
-
-	if (direction.dot(front) > 0.5)
-	{
-		return testCollisionAgainstWorld(rayOrigin, direction, distance);
-	}
-
-	return false;
-}
-
 bool World::checkCollectiblePickup() {
 
 	Vector3 collectiblePos = collectible->model.getTranslation();
