@@ -3,13 +3,16 @@
 
 #define CHECK_FLAGS(F, NEW_F) ((F) == 0 ? (NEW_F) : (F) & (NEW_F))
 
-#define SOUNDS_N 4
+#define SOUNDS_N 7
 
 SoundFile SOUNDS[SOUNDS_N] = {
 	// {name, path, loop, spatial}
 	{"music", "data/sounds/background-music.wav", true, false},
 	{"jump", "data/sounds/jump.wav", false, true},
 	{"sneak", "data/sounds/sneak.wav", false, true},
+	{"dash", "data/sounds/dash.wav", false, true},
+	{"walk", "data/sounds/walking.wav", true, false},
+	{"slow", "data/sounds/slow_walking.wav", true, false},
 	{"alarm", "data/sounds/alarm.wav", false, false}
 };
 
@@ -31,7 +34,7 @@ Audio::Audio(SoundFile soundfile) {
 		soundfile.path.c_str(), 	// Filepath
 		0,							// Offset
 		0,							// Length
-		1,							// Max playbacks
+		10,							// Max playbacks
 		flags 						// Flags
 	);
 
@@ -54,6 +57,14 @@ HCHANNEL Audio::play(float volume) {
 	BASS_ChannelSetAttribute(hSampleChannel, BASS_ATTRIB_VOL, volume);
 	BASS_ChannelPlay(hSampleChannel, true);
 	return hSampleChannel;
+}
+
+bool Audio::pause() {
+	return BASS_ChannelPause(hSampleChannel);
+}
+
+bool Audio::stop() {
+	return Stop(hSampleChannel);
 }
 
 bool Audio::Init() {

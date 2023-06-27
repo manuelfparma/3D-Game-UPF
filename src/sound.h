@@ -23,6 +23,8 @@ public:
 
 	// Play audio and return the channel
 	HCHANNEL play(float volume);
+	bool pause();
+	bool stop();
 
 	// Manager stuff
 	// The map!

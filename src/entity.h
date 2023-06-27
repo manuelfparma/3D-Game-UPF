@@ -6,6 +6,7 @@
 #include "shader.h"
 #include "AIBehaviour.h"
 #include "EntityAnimation.h"
+#include "sound.h"
 
 class Entity
 {
@@ -92,6 +93,8 @@ public:
 	const float floor_friction = 0.96f;
 	bool crouching = false;
 
+	Audio *walking_sound, *slow_walking;
+	bool sound_playing = false;
 
 	const float stamina_growth = 10.f;
 	const float dash_cost = 40.f;
