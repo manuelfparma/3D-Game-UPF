@@ -143,6 +143,33 @@ void EntityPlayer::onTouchFloor() {
 }
 
 
+enum Directions { FRONT_DIR, BACK_DIR, LEFT_DIR, RIGHT_DIR, IDLE_DIR };
+
+int getDirection(const Vector3& move_dir, const Vector3& move_right, const Vector3& move_front) {
+	float dotRight = move_right.dot(move_dir);
+	float dotForward = move_front.dot(move_dir);
+
+	if (dotRight > 0 && std::abs(dotRight) > std::abs(dotForward))
+	{
+		return RIGHT_DIR;
+	}
+	else if (dotRight < 0 && std::abs(dotRight) > std::abs(dotForward))
+	{
+		return LEFT_DIR;
+	}
+	else if (dotForward > 0 && std::abs(dotForward) >= std::abs(dotRight))
+	{
+		return FRONT_DIR;
+	}
+	else if (dotForward < 0 && std::abs(dotForward) >= std::abs(dotRight))
+	{
+		return BACK_DIR;
+	}
+
+	return IDLE_DIR;
+}
+
+
 void EntityPlayer::update(float seconds_elapsed){
 
 	yaw -= Input::mouse_delta.x * seconds_elapsed * 10.f * DEG2RAD;
@@ -167,7 +194,7 @@ void EntityPlayer::update(float seconds_elapsed){
 
 	float curSpeed = speed;
 
-	int animation_state;
+	int animation_state = -1;
 
 	if (Input::isKeyPressed(SDL_SCANCODE_W)) move_dir += move_front;
 	if (Input::isKeyPressed(SDL_SCANCODE_A)) move_dir += move_right;
@@ -183,33 +210,13 @@ void EntityPlayer::update(float seconds_elapsed){
 		curSpeed *= crouch_factor; 
 		crouching = true;
 
-		if (move_dir.length() < 0.1) {
-			animation_state = NINJA_IDLE_CROUCH;
-		}
-		else {
-			animation_state = NINJA_CROUCH_MOVE;
-		}
 	}
 	else {
 		if (crouching && sound_playing) {
 			slow_walking->pause();
 			sound_playing = false;
 		}
-
 		crouching = false;
-
-		if (move_dir.length() < 0.1) {
-			animation_state = NINJA_IDLE;
-		}
-		else {
-			if (Input::isKeyPressed(SDL_SCANCODE_S)) {
-				animation_state = NINJA_BACKWARDS;
-			}
-			else {
-			animation_state = NINJA_RUN;
-		}
-			
-		}
 	}
 
 	if (move_dir.length() > 0) {
@@ -228,11 +235,10 @@ void EntityPlayer::update(float seconds_elapsed){
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_Q)) {
 		// dashing
-		animation_state = NINJA_RUN;
 		if (dashes){
 
 			if (stamina >= dash_cost) {
-
+				animation_state = NINJA_FRONT;
 				stamina -= dash_cost;
 				velocity += move_front * dash_speed;
 				dashes-=1;
@@ -243,10 +249,9 @@ void EntityPlayer::update(float seconds_elapsed){
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
 		// jumping
-		animation_state = NINJA_JUMP;
 		if (jumps) {
 			if (stamina >= jump_cost) {
-
+				animation_state = NINJA_JUMP;
 				stamina -= jump_cost;
 				velocity.y = jump_speed;
 				jumps -= 1;
@@ -292,11 +297,6 @@ void EntityPlayer::update(float seconds_elapsed){
 				onFloor = true;
 				dashes = max_dashes;
 				jumps = max_jumps;
-
-				/* if (!isOnFloor) {
-					onTouchFloor();
-				}; */
-
 				velocity.y = 0;
 
 			}
@@ -307,15 +307,9 @@ void EntityPlayer::update(float seconds_elapsed){
 		}
 	}
 
-	//TODO: DEV
-	if (Input::wasButtonPressed(SDL_SCANCODE_R)) {
-		model.setTranslation(initial_pos);
-	}
-
 
 	if (!onFloor) {
 		// gravitational pull
-		animation_state = NINJA_FALLING;
 		velocity.y -= gravity_speed * seconds_elapsed;
 	}
 
@@ -348,8 +342,41 @@ void EntityPlayer::update(float seconds_elapsed){
 		lastYaw = yaw;
 	model.rotate(lastYaw, Vector3(0, 1, 0));
 
-	playerAnimation->goToState(animation_state, 0.0f);
-	// isOnFloor = onFloor;
+
+
+	if (animation_state == -1) {
+		if (!onFloor) {
+			animation_state = NINJA_FALL;
+		}
+		else {
+			int direction = getDirection(move_dir, move_right, move_front);
+
+			switch (direction) {
+			case IDLE_DIR:
+				animation_state = (crouching) ? NINJA_IDLE_CROUCH: NINJA_IDLE;
+				break;
+			case FRONT_DIR:
+				animation_state = (crouching) ? NINJA_FRONT_CROUCH : NINJA_FRONT;
+				break;
+			case BACK_DIR:
+				animation_state = (crouching) ? NINJA_BACK_CROUCH : NINJA_BACK;
+				break;
+			case LEFT_DIR:
+				animation_state = (crouching) ? NINJA_FRONT_CROUCH : NINJA_LEFT;
+				break;
+			case RIGHT_DIR:
+				animation_state = (crouching) ? NINJA_FRONT_CROUCH : NINJA_RIGHT;
+				break;
+				
+			}
+
+		}
+		playerAnimation->goToState(animation_state);
+	}
+	else {
+		playerAnimation->goToState(animation_state);
+	}
+
 }
 
 void EntityPlayer::render() {
@@ -424,7 +451,7 @@ void EntityArmy::update(float seconds_elapsed) {
 		animation_state = ENEMY_PATROL;
 	}
 
-	armyAnimation->goToState(animation_state);
+	armyAnimation->goToState(animation_state, 0.0F, ENEMY_ANIMATIONS);
 }
 
 void EntityArmy::render() {

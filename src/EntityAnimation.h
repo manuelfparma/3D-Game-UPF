@@ -1,9 +1,8 @@
 #pragma once
 #include "animation.h"
-enum AnimatedEntities {NINJA_ANIMATIONS, ENEMY_ANIMATIONS, ARTIFACT_ANIMATIONS};
-enum NinjaStates { NINJA_IDLE, NINJA_IDLE_CROUCH, NINJA_RUN, NINJA_CROUCH_MOVE, NINJA_BACKWARDS, NINJA_JUMP, NINJA_POINT, NINJA_FALLING};
+enum AnimatedEntities {NINJA_ANIMATIONS, ENEMY_ANIMATIONS};
+enum NinjaStates { NINJA_IDLE, NINJA_IDLE_CROUCH, NINJA_LEFT, NINJA_RIGHT, NINJA_FRONT, NINJA_FRONT_CROUCH, NINJA_BACK, NINJA_BACK_CROUCH, NINJA_JUMP, NINJA_FALL };
 enum EnemyStates { ENEMY_PATROL, ENEMY_CHASE, ENEMY_ALERT};
-enum ArtifactStates { IDLE, PICKED_UP };
 
 class EntityAnimation
 {
@@ -11,7 +10,7 @@ public:
 	EntityAnimation(AnimatedEntities type);
 	void update(float seconds_elapsed);
 	void addAnimationState(const char* path, int state);
-	void goToState(int state, float time = 0.f);
+	void goToState(int state, float time = 0.f, int type=NINJA_ANIMATIONS);
 
 	Skeleton& getCurrentSkeleton();
 private:

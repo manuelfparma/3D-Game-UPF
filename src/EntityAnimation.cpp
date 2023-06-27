@@ -8,12 +8,14 @@ EntityAnimation::EntityAnimation(AnimatedEntities type) {
 	case NINJA_ANIMATIONS:
 		EntityAnimation::addAnimationState("data/animations/ninja/idle.skanim", NINJA_IDLE);
 		EntityAnimation::addAnimationState("data/animations/ninja/idle_crouch.skanim", NINJA_IDLE_CROUCH);
-		EntityAnimation::addAnimationState("data/animations/ninja/run.skanim", NINJA_RUN);
-		EntityAnimation::addAnimationState("data/animations/ninja/sneak_walk.skanim", NINJA_CROUCH_MOVE);
-		EntityAnimation::addAnimationState("data/animations/ninja/walk_backwards.skanim", NINJA_BACKWARDS);
+		EntityAnimation::addAnimationState("data/animations/ninja/jog_left.skanim", NINJA_LEFT);
+		EntityAnimation::addAnimationState("data/animations/ninja/jog_right.skanim", NINJA_RIGHT);
+		EntityAnimation::addAnimationState("data/animations/ninja/run.skanim", NINJA_FRONT);
+		EntityAnimation::addAnimationState("data/animations/ninja/sneak_walk.skanim", NINJA_FRONT_CROUCH);
+		EntityAnimation::addAnimationState("data/animations/ninja/walk_backwards.skanim", NINJA_BACK);
+		EntityAnimation::addAnimationState("data/animations/ninja/sneak_walk.skanim", NINJA_BACK_CROUCH);
 		EntityAnimation::addAnimationState("data/animations/ninja/jumping_up.skanim", NINJA_JUMP);
-		EntityAnimation::addAnimationState("data/animations/ninja/pointing.skanim", NINJA_POINT);
-		EntityAnimation::addAnimationState("data/animations/ninja/falling.skanim", NINJA_FALLING);
+		EntityAnimation::addAnimationState("data/animations/ninja/falling.skanim", NINJA_FALL);
 		current_state = NINJA_IDLE;
 		break;
 	case ENEMY_ANIMATIONS:
@@ -22,8 +24,6 @@ EntityAnimation::EntityAnimation(AnimatedEntities type) {
 		EntityAnimation::addAnimationState("data/animations/samurai/yell.skanim", ENEMY_ALERT);
 
 		current_state = ENEMY_PATROL;
-		break;
-	case ARTIFACT_ANIMATIONS:
 		break;
 	default:
 		break;
@@ -37,7 +37,13 @@ void EntityAnimation::addAnimationState(const char* path, int state) {
 	animation_states[state] = Animation::Get(path);
 }
 
-void EntityAnimation::goToState(int state, float time) {
+void EntityAnimation::goToState(int state, float time, int type) {
+
+	if (type == NINJA_ANIMATIONS) {
+		// MOVEMENT TO MOVEMENT ANIMATION
+		if (NINJA_IDLE < current_state < NINJA_BACK_CROUCH && NINJA_IDLE < state < NINJA_BACK_CROUCH) time = 0.2f;
+	}
+
 	if (time == 0.0f) {
 		current_state = state;
 		return;
@@ -53,10 +59,16 @@ void EntityAnimation::goToState(int state, float time) {
 }
 
 void EntityAnimation::update(float seconds_elapsed) {
-	animation_states[current_state]->assignTime(Game::instance->time);
+
+	float time = Game::instance->time;
+
+	// THESE ARE BACKWARDS ANIMATIONS
+	if (current_state == NINJA_BACK_CROUCH) time *= -1.f;
+
+	animation_states[current_state]->assignTime(time);
 
 	if (target_state != -1) {
-		animation_states[target_state]->assignTime(Game::instance->time);
+		animation_states[target_state]->assignTime(time);
 		transition_counter += seconds_elapsed;
 
 		if (transition_counter >= transition_time) {
