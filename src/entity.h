@@ -128,6 +128,7 @@ public:
 	std::vector<bool> marked;
 	bool onAlert = false;
 	float seenCooldown = ATTENTION_TIME;
+	EntityAnimation* armyAnimation = new EntityAnimation(ENEMY_ANIMATIONS);
 
 	void update(float seconds_elapsed);
 	void render() override;

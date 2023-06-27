@@ -483,6 +483,56 @@ void Mesh::renderAnimated( unsigned int primitive, Skeleton* skeleton )
 	render(primitive);
 }
 
+
+void Mesh::renderInstancedAnimated(unsigned int primitive, const Matrix44* instanced_models, int num_instances, Skeleton* skeleton)
+{
+	if (!num_instances)
+		return;
+
+	Shader* shader = Shader::current;
+	assert(shader && "shader must be enabled");
+
+	if (instances_buffer_id == 0)
+		glGenBuffersARB(1, &instances_buffer_id);
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, instances_buffer_id);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, num_instances * sizeof(Matrix44), instanced_models, GL_STREAM_DRAW_ARB);
+
+	int attribLocation = shader->getAttribLocation("u_model");
+	assert(attribLocation != -1 && "shader must have attribute mat4 u_model (not a uniform)");
+	if (attribLocation == -1)
+		return; //this shader doesnt support instanced model
+
+	//mat4 count as 4 different attributes of vec4... (thanks opengl...)
+	for (int k = 0; k < 4; ++k)
+	{
+		glEnableVertexAttribArray(attribLocation + k);
+		int offset = sizeof(float) * 4 * k;
+		const Uint8* addr = (Uint8*)offset;
+		glVertexAttribPointer(attribLocation + k, 4, GL_FLOAT, false, sizeof(Matrix44), addr);
+		glVertexAttribDivisor(attribLocation + k, 1); // This makes it instanced!
+	}
+
+	//regular render
+	std::vector<Matrix44> bone_matrices;
+	assert(bones.size());
+	int bones_loc = shader->getUniformLocation("u_bones");
+	if (bones_loc != -1)
+	{
+		skeleton->computeFinalBoneMatrices(bone_matrices, this);
+		shader->setUniform("u_bones", bone_matrices);
+	}
+
+	render(primitive, -1, num_instances);
+
+	//disable instanced attribs
+	for (int k = 0; k < 4; ++k)
+	{
+		glDisableVertexAttribArray(attribLocation + k);
+		glVertexAttribDivisor(attribLocation + k, 0);
+	}
+}
+
+
 void Mesh::uploadToVRAM()
 {
 	assert(vertices.size() || interleaved.size());

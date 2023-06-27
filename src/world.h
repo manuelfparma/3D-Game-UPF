@@ -36,7 +36,7 @@ public:
 	HCHANNEL bgMusic;
 
 	// stats
-	int ENEMY_COUNT = 5;
+	int ENEMY_COUNT = 10;
 	float MAX_VIEW_DISTANCE = 50.f;
 
 	World(const char* sceneFilename);
