@@ -107,7 +107,7 @@ public:
 	int lives = 3;
 	const float DAMAGED_TIME = 10.f;
 	float damage_cooldown = 0.f;
-
+	bool landlocked = false;
 	const float INVISIBLE_COOLDOWN = 5.f;
 	bool invisible = false;
 	float invisible_time = 0;

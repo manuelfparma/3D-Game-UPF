@@ -234,32 +234,35 @@ void EntityPlayer::update(float seconds_elapsed){
 	// we suppose the player is on the air
 	bool onFloor = false;
 
+	// dashing and jumping are not available in certain cases
+	if (!landlocked) {
 
-	if (Input::wasKeyPressed(SDL_SCANCODE_Q)) {
-		// dashing
-		animation_state = NINJA_RUN;
-		if (dashes){
+		if (Input::wasKeyPressed(SDL_SCANCODE_Q)) {
+			// dashing
+			animation_state = NINJA_RUN;
+			if (dashes){
 
-			if (stamina >= dash_cost) {
+				if (stamina >= dash_cost) {
 
-				stamina -= dash_cost;
-				velocity += move_front * dash_speed;
-				dashes-=1;
-				Audio::Play("dash");
+					stamina -= dash_cost;
+					velocity += move_front * dash_speed;
+					dashes-=1;
+					Audio::Play("dash");
+				}
 			}
 		}
-	}
 
-	if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
-		// jumping
-		animation_state = NINJA_JUMP;
-		if (jumps) {
-			if (stamina >= jump_cost) {
+		if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
+			// jumping
+			animation_state = NINJA_JUMP;
+			if (jumps) {
+				if (stamina >= jump_cost) {
 
-				stamina -= jump_cost;
-				velocity.y = jump_speed;
-				jumps -= 1;
-				Audio::Play("jump");
+					stamina -= jump_cost;
+					velocity.y = jump_speed;
+					jumps -= 1;
+					Audio::Play("jump");
+				}
 			}
 		}
 	}

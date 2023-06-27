@@ -32,7 +32,12 @@ World::World(const char* sceneFilename) {
 	Mesh* collectibleMesh = new Mesh();
 	collectibleMesh->createCube();
 	collectible = new EntityCollider( collectibleMesh, Texture::getBlackTexture(), Shader::getDefaultShader("flat"));
-	collectible->model.setTranslation(Vector3(130.f, 5.f, 30.f));
+	collectible->model.setTranslation(COLLECTIBLE_LOCATION);
+
+	Mesh* exitMesh = new Mesh();
+	exitMesh->createCube();
+	exit_mark = new EntityCollider(exitMesh, Texture::getBlackTexture(), Shader::getDefaultShader("texture"));
+	exit_mark->model.setTranslation(EXIT_LOCATION);
 
 	createSkybox();
 	createEnemies();
@@ -125,7 +130,10 @@ void World::render() {
 	//Draw the floor grid
 	drawGrid();
 
-	collectible->render();
+	if (!collectible_obtained)
+		collectible->render();
+	else
+		exit_mark->render();
 
 	if (freeCam || !firstPerson)
 		player->render();
@@ -154,6 +162,15 @@ void World::update(double seconds_elapsed) {
 	// check if the game is lost
 	if (player->lives <= 0) {
 		Game::instance->stageManager->changeStage(OUTRO_STAGE, 0);
+		return;
+	}
+
+	// check if the game is won
+	if (checkPlayerExit()) {
+		player->walking_sound->pause();
+		player->slow_walking->pause();
+		Game::instance->stageManager->changeStage(OUTRO_STAGE, 1);
+		return;
 	}
 
     //to navigate with the mouse fixed in the middle
@@ -173,7 +190,9 @@ void World::update(double seconds_elapsed) {
 	if (Input::wasKeyPressed(SDL_SCANCODE_E)) {
 		// player->playerAnimation->goToState(NINJA_POINT, 2.f);
 		if (checkCollectiblePickup()) {
-			Game::instance->stageManager->changeStage(OUTRO_STAGE, 1);
+			std::cout << "collectible grabbed!\n";
+			player->landlocked = true;
+			collectible_obtained = true;
 		}
 		else {
 			checkEnemyMarking();
@@ -302,6 +321,7 @@ bool World::testCollisionAgainstWorld(Vector3 rayOrigin, Vector3 direction, floa
 }
 
 bool World::checkCollectiblePickup() {
+	if (collectible_obtained) return false;
 
 	Vector3 collectiblePos = collectible->model.getTranslation();
 	Vector3 playerPos = player->model.getTranslation();
@@ -316,6 +336,18 @@ bool World::checkCollectiblePickup() {
 
 	return false;
 };
+
+bool World::checkPlayerExit() {
+	if (!collectible_obtained) return false;
+
+	return exit_mark->mesh->testSphereCollision(
+		exit_mark->model,
+		player->model.getTranslation(),
+		player->model_height,
+		Vector3(),
+		Vector3()
+	);
+}
 
 void World::checkEnemyMarking() {
 	Vector3 cameraDirection = normalize(camera->center - camera->eye);
