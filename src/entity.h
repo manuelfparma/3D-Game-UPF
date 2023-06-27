@@ -74,7 +74,7 @@ public:
 class EntityPlayer : public EntityCollider {
 public:
 	// Initial position
-	Vector3 initial_pos = Vector3(-7.f, 35.f, -120.f);
+	Vector3 initial_pos = Vector3(-7.f, 100.f, -120.f);
 
 	// Rotation
 	float yaw = 0.f;
