@@ -148,6 +148,7 @@ void EntityPlayer::loseLife() {
 	lives--;
 	damage_cooldown = DAMAGED_TIME;
 	std::cout << "LIFE LOST! Remaining: " << lives << std::endl;
+	Audio::Play("hurt");
 }
 
 

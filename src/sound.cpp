@@ -3,7 +3,7 @@
 
 #define CHECK_FLAGS(F, NEW_F) ((F) == 0 ? (NEW_F) : (F) & (NEW_F))
 
-#define SOUNDS_N 8
+#define SOUNDS_N 9
 
 SoundFile SOUNDS[SOUNDS_N] = {
 	// {name, path, loop, spatial}
@@ -11,6 +11,7 @@ SoundFile SOUNDS[SOUNDS_N] = {
 	{"jump", "data/sounds/jump.wav", false, false},
 	{"sneak", "data/sounds/sneak.wav", false, false},
 	{"dash", "data/sounds/dash.wav", false, false},
+	{"hurt", "data/sounds/hurt.wav", false, false},
 	{"walk", "data/sounds/walking.wav", true, false},
 	{"slow", "data/sounds/slow_walking.wav", true, false},
 	{"marching", "data/sounds/marching.wav", true, false},
