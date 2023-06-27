@@ -3,6 +3,7 @@
 #include "world.h"
 #include "stage.h"
 #include "extra/pathfinder/PathFinder.h"
+#include "sound.h"
 #include <fstream>
 
 void WayPoint::addLink(WayPoint* other, float distance) {
@@ -96,8 +97,10 @@ void AIBehaviour::update(float seconds_elapsed) {
 	{
 	case SEARCH_STATE:
 		// check if we can see the player
-		if (checkLineOfSight() && !invisible_player)
+		if (checkLineOfSight() && !invisible_player) {
+			Audio::Play("alarm");
 			state = FOUND_STATE;
+		}
 		// check current path movement and orientation
 		else if (checkPointProximity((*destination)->position)) {
 			++destination;

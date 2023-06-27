@@ -363,7 +363,7 @@ void EntityArmy::update(float seconds_elapsed) {
 			animation_state = ENEMY_CHASE;
 		}
 		// move enemy (state machine updates orientation)
-		if (stateMachines[i].isMoving)
+		if (stateMachines[i].isMoving && !(playerSeen && !onAlert))
 			mModel->translate(0, 0, moveSpeed * seconds_elapsed);
 	}
 

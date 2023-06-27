@@ -3,13 +3,14 @@
 
 #define CHECK_FLAGS(F, NEW_F) ((F) == 0 ? (NEW_F) : (F) & (NEW_F))
 
-#define SOUNDS_N 3
+#define SOUNDS_N 4
 
 SoundFile SOUNDS[SOUNDS_N] = {
 	// {name, path, loop, spatial}
 	{"music", "data/sounds/background-music.wav", true, false},
 	{"jump", "data/sounds/jump.wav", false, true},
-	{"sneak", "data/sounds/sneak.wav", false, true}
+	{"sneak", "data/sounds/sneak.wav", false, true},
+	{"alarm", "data/sounds/alarm.wav", false, false}
 };
 
 // without the redefinition below, the linker does not work
