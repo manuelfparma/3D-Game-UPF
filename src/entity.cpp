@@ -120,7 +120,6 @@ EntityPlayer::EntityPlayer() : EntityCollider(true, PLAYER) {
 	//mesh = Mesh::Get("data/models/ninja.obj");
 	mesh = Mesh::Get("data/models/ninja_reuv.MESH");
 	texture = Texture::Get("data/textures/ninja_texture.tga");
-	//shader = Shader::Get("data/shaders/basic.vs", "data/shaders/material.fs");
 	shader = Shader::Get("data/shaders/skinning.vs", "data/shaders/texture.fs");
 }
 
@@ -325,11 +324,7 @@ void EntityPlayer::update(float seconds_elapsed){
 
 void EntityPlayer::render() {
 
-
-	float elapsed_seconds = Game::instance->elapsed_time - game_time;
-	game_time = Game::instance->elapsed_time;
-
-	playerAnimation->update(elapsed_seconds);
+	playerAnimation->update(Game::instance->elapsed_time);
 
 	if (invisible) {
 		glEnable(GL_BLEND);
@@ -352,7 +347,7 @@ void EntityPlayer::render() {
 
 void EntityArmy::update(float seconds_elapsed) {
 	bool playerSeen = false;
-
+	int animation_state;
 	for (int i = 0; i < models.size(); ++i){
 		// get model matrix of current enemy
 		Matrix44* mModel = &models[i];
@@ -361,6 +356,7 @@ void EntityArmy::update(float seconds_elapsed) {
 		// check if player was found
 		if (stateMachines[i].state == FOUND_STATE) {
 			playerSeen = true;
+			animation_state = ENEMY_CHASE;
 		}
 		// move enemy (state machine updates orientation)
 		if (stateMachines[i].isMoving)
@@ -371,16 +367,22 @@ void EntityArmy::update(float seconds_elapsed) {
 		seenCooldown -= seconds_elapsed;
 		if (seenCooldown < 0)
 			onAlert = true;
+		else animation_state = ENEMY_ALERT;
 	}
 	else {
 		seenCooldown = ATTENTION_TIME;
 		onAlert = false;
+		animation_state = ENEMY_PATROL;
 	}
+
+	armyAnimation->goToState(animation_state);
 }
 
 void EntityArmy::render() {
 	// Get the last camera that was activated 
 	Camera* camera = Camera::current;
+
+	armyAnimation->update(Game::instance->elapsed_time);
 
 	// Enable shader and pass uniforms 
 	shader->enable();
@@ -406,7 +408,7 @@ void EntityArmy::render() {
 	}
 
 	// first we render normal enemies
-	mesh->renderInstanced(GL_TRIANGLES, normal_render.data(), normal_render.size());
+	mesh->renderInstancedAnimated(GL_TRIANGLES, normal_render.data(), normal_render.size(), &armyAnimation->getCurrentSkeleton());
 
 	// now we render marked enemies after clearing z-buffer
 	color = onAlert ? FOUND_COLOR : SEARCH_COLOR;
@@ -414,7 +416,7 @@ void EntityArmy::render() {
 	if (texture) shader->setTexture("u_texture", texture, 0);
 
 	glClear(GL_DEPTH_BUFFER_BIT);
-	mesh->renderInstanced(GL_TRIANGLES, marked_render.data(), marked_render.size());
+	mesh->renderInstancedAnimated(GL_TRIANGLES, marked_render.data(), marked_render.size(), &armyAnimation->getCurrentSkeleton());
 
 	// Disable shader after finishing rendering
 	shader->disable();

@@ -107,7 +107,7 @@ public:
 	void renderBounding( const Matrix44& model, bool world_bounding = true );
 	void renderFixedPipeline(int primitive); //sloooooooow
 	void renderAnimated(unsigned int primitive, Skeleton *sk);
-
+	void renderInstancedAnimated(unsigned int primitive, const Matrix44* instanced_models, int num_instances, Skeleton* skeleton);
 	void enableBuffers(Shader* shader);
 	void drawCall(unsigned int primitive, int submesh_id, int draw_call_id, int num_instances);
 	void disableBuffers(Shader* shader);

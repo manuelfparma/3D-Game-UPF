@@ -17,10 +17,11 @@ EntityAnimation::EntityAnimation(AnimatedEntities type) {
 		current_state = NINJA_IDLE;
 		break;
 	case ENEMY_ANIMATIONS:
-		EntityAnimation::addAnimationState("data/animations/idle.skanim", ENEMY_PATROL);
-		EntityAnimation::addAnimationState("data/animations/idle.skanim", ENEMY_CHASE);
-		EntityAnimation::addAnimationState("data/animations/idle.skanim", ENEMY_ALERT);
+		EntityAnimation::addAnimationState("data/animations/samurai/patrol.skanim", ENEMY_PATROL);
+		EntityAnimation::addAnimationState("data/animations/samurai/chase.skanim", ENEMY_CHASE);
+		EntityAnimation::addAnimationState("data/animations/samurai/yell.skanim", ENEMY_ALERT);
 
+		current_state = ENEMY_PATROL;
 		break;
 	case ARTIFACT_ANIMATIONS:
 		break;
