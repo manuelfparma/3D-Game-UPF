@@ -142,6 +142,14 @@ void EntityPlayer::onTouchFloor() {
 	dashes = max_dashes;
 }
 
+void EntityPlayer::loseLife() {
+	if (damage_cooldown > 0)
+		return;
+	lives--;
+	damage_cooldown = DAMAGED_TIME;
+	std::cout << "LIFE LOST! Remaining: " << lives << std::endl;
+	Audio::Play("hurt");
+}
 
 enum Directions { FRONT_DIR, BACK_DIR, LEFT_DIR, RIGHT_DIR, IDLE_DIR };
 
@@ -232,6 +240,8 @@ void EntityPlayer::update(float seconds_elapsed){
 	// we suppose the player is on the air
 	bool onFloor = false;
 
+	// dashing and jumping are not available in certain cases
+	if (!landlocked) {
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_Q)) {
 		// dashing
@@ -245,7 +255,6 @@ void EntityPlayer::update(float seconds_elapsed){
 				Audio::Play("dash");
 			}
 		}
-	}
 
 	if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
 		// jumping
@@ -342,6 +351,8 @@ void EntityPlayer::update(float seconds_elapsed){
 		lastYaw = yaw;
 	model.rotate(lastYaw, Vector3(0, 1, 0));
 
+	// invincibility cooldown
+	damage_cooldown = max(damage_cooldown - seconds_elapsed, 0.f);
 
 
 	if (animation_state == -1) {

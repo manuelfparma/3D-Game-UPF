@@ -104,7 +104,10 @@ public:
 	int dashes;
 	int jumps;
 	float game_time;
-
+	int lives = 3;
+	const float DAMAGED_TIME = 10.f;
+	float damage_cooldown = 0.f;
+	bool landlocked = false;
 	const float INVISIBLE_COOLDOWN = 5.f;
 	bool invisible = false;
 	float invisible_time = 0;
@@ -119,6 +122,7 @@ public:
 	EntityAnimation* playerAnimation = new EntityAnimation(NINJA_ANIMATIONS);
 
 	void onTouchFloor();
+	void loseLife();
 	void update(float seconds_elapsed) override;
 	void render() override;
 	EntityPlayer();

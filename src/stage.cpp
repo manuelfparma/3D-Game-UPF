@@ -74,8 +74,10 @@ void OutroStage::onEnter(int enterCode) {
     switch (enterCode) {
     case 0:
         text = "You lose :(";
+        break;
     case 1:
         text = "You win!";
+        break;
     default:
         break;
     }

@@ -116,8 +116,13 @@ void AIBehaviour::update(float seconds_elapsed) {
 		rotateEnemyToNewPoint(player);
 
 		if (checkLineOfSight() && !invisible_player) {
-			// if we are close to the player, stop moving
-			isMoving = !checkPointProximity(player);
+			// if we are close to the player, stop moving and make player lose a life
+			if (checkPointProximity(player)) {
+				isMoving = false;
+				world->player->loseLife();
+			}
+			else
+				isMoving = true;
 		}
 		else {
 			// else, return to search state
