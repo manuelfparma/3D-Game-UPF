@@ -89,7 +89,7 @@ public:
 	const int max_jumps = 1;
 	const float dash_speed = 200.0f;
 	const float gravity_speed = 150.f;
-	const float floor_friction = 0.001f;
+	const float floor_friction = 0.96f;
 
 
 	const float stamina_growth = 10.f;

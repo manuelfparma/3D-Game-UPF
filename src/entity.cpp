@@ -307,8 +307,8 @@ void EntityPlayer::update(float seconds_elapsed){
 
 	position += velocity * seconds_elapsed;
 	// floor friction
-	velocity.x *= pow(floor_friction, seconds_elapsed);
-	velocity.z *= pow(floor_friction, seconds_elapsed);
+	velocity.x *= floor_friction;
+	velocity.z *= floor_friction;
 
 	// stamina regen
 	stamina = clamp(stamina + stamina_growth * seconds_elapsed, 0, 100);

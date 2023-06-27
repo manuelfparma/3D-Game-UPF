@@ -43,6 +43,10 @@ World::World(const char* sceneFilename) {
 	// play background music
 	Audio* music = Audio::Get("music");
 	bgMusic = music->play(0.5);
+
+	// fixme: first time calling this function is slow
+	// so we call it here to improve experience
+	checkEnemyMarking();
 }
 
 void World::createSkybox() {
