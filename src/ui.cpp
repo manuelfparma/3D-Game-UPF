@@ -51,7 +51,7 @@ void UI::renderStatic() {
 
 void UI::renderDynamic() {
 	renderStaminaBar();
-	renderArtifact();
+	if (player->collectible_obtained) renderCollectible();
 }
 
 
@@ -131,10 +131,10 @@ void UI::renderStaminaBar() {
 
 }
 
-void UI::renderArtifact() {
-	Mesh* artifact = new Mesh();
+void UI::renderCollectible() {
+	Mesh* collectible = new Mesh();
 
-	artifact->createQuad(0.8 * width, (0.15) * height, height * 0.2, width * 0.2, true);
+	collectible->createQuad(0.8 * width, (0.15) * height, height * 0.2, width * 0.2, true);
 	shader->setUniform("u_texture", Texture::Get("data/ui/artifact.png"), 0);
-	artifact->render(GL_TRIANGLES);
+	collectible->render(GL_TRIANGLES);
 }

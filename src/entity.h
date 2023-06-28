@@ -104,6 +104,7 @@ public:
 	int dashes;
 	int jumps;
 	float game_time;
+	const int max_lives = 3;
 	int lives = 3;
 	const float DAMAGED_TIME = 10.f;
 	float damage_cooldown = 0.f;
@@ -111,6 +112,8 @@ public:
 	const float INVISIBLE_COOLDOWN = 5.f;
 	bool invisible = false;
 	float invisible_time = 0;
+	bool collectible_obtained = false;
+
 
 	// bool isOnFloor = false;
 	float stamina = 100.0f;

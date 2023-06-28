@@ -18,6 +18,6 @@ public:
 	void renderCrosshair();
 	void renderStaminaBar();
 	void renderAbilities();
-	void renderArtifact();
+	void renderCollectible();
 
 };

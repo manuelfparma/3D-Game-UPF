@@ -42,7 +42,6 @@ public:
 
 	Vector3 COLLECTIBLE_LOCATION = Vector3(130.f, 5.f, 30.f);
 	Vector3 EXIT_LOCATION = Vector3(-175.f, 2.f, -27.f);
-	bool collectible_obtained = false;
 
 	World(const char* sceneFilename);
 	bool parseScene(const char* filename);

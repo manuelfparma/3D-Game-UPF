@@ -127,7 +127,7 @@ void World::render() {
 	}
 
     root->render(); 
-	if (!collectible_obtained)
+	if (!player->collectible_obtained)
 		collectible->render();
 	else
 		exit_mark->render();
@@ -189,7 +189,7 @@ void World::update(double seconds_elapsed) {
 		if (checkCollectiblePickup()) {
 			std::cout << "collectible grabbed!\n";
 			player->landlocked = true;
-			collectible_obtained = true;
+			player->collectible_obtained = true;
 		}
 		else {
 			checkEnemyMarking();
@@ -318,7 +318,7 @@ bool World::testCollisionAgainstWorld(Vector3 rayOrigin, Vector3 direction, floa
 }
 
 bool World::checkCollectiblePickup() {
-	if (collectible_obtained) return false;
+	if (player->collectible_obtained) return false;
 
 	Vector3 collectiblePos = collectible->model.getTranslation();
 	Vector3 playerPos = player->model.getTranslation();
@@ -335,7 +335,7 @@ bool World::checkCollectiblePickup() {
 };
 
 bool World::checkPlayerExit() {
-	if (!collectible_obtained) return false;
+	if (!player->collectible_obtained) return false;
 
 	return exit_mark->mesh->testSphereCollision(
 		exit_mark->model,
