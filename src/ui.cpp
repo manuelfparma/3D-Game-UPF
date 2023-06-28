@@ -96,9 +96,7 @@ void UI::renderStatic() {
 
 void UI::renderDynamic() {
 	renderStaminaBar();
-	renderCollectible();
-
-	// if (player->collectible_obtained) renderCollectible();
+	if (player->collectible_obtained) renderCollectible();
 }
 
 
