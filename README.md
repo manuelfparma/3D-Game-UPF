@@ -1,6 +1,8 @@
 # Shinobi Thief
 
-![Shinobi Thief Game Logo](data/logo.png)
+<p align="center">
+  <img src="data/logo.png">
+</p>
 
 ## Project
 
