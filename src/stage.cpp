@@ -181,15 +181,22 @@ void IntroStage::render() {
     shader->setUniform("u_discard", true);
     shader->setUniform("u_discard_color", Vector3(0.0f, 0.0f, 0.0f));
 
-    shader->setUniform("u_texture", Texture::Get("data/ui/ninja_bg.png"), 0);
+    Texture* bg_image = Texture::Get("data/ui/ninja_bg.png");
+    if (tutorial)
+        bg_image = Texture::Get("data/ui/tutorial.png");
+
+    shader->setUniform("u_texture", bg_image, 0);
     background->render(GL_TRIANGLES);
     
     float width = Game::instance->window_width,
         height = Game::instance->window_height;
 
-    if (addButton(width * 0.5f, height * 0.2f, 200, 100, "data/ui/start_btn.png")) {
+    if (addButton(width * 0.5f, height * 0.1f, 200, 70, "data/ui/start_btn.png")) {
         // start button was pressed
-        start = true;
+        if (!tutorial)
+            tutorial = true;
+        else
+            start = true;
     }
 
     glEnable(GL_DEPTH_TEST);

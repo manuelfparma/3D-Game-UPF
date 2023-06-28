@@ -41,6 +41,7 @@ public:
 class IntroStage : public Stage {
 public:
 	bool start = false;
+	bool tutorial = false;
 
 	IntroStage();
 
