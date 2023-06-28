@@ -1,10 +1,17 @@
-COMPILING IN LINUX
-****************************
+Aniol Medico Soldevila - NIA: 239467 - aniol.medico01@estudiant.upf.edu
+Manuel Félix Parma - NIA: 255570 - manuelfelix.parma01@estudiant.upf.edu 
 
-Remember to install the libraries:
-
-sudo apt-get install libsdl2-dev freeglut3 freeglut3-dev
-
-and then just use the makefile:
-
-make
+Block Distribution:
+- AI (M)
+- Animations (A)
+- Assets
+- Balancing (M)
+- Camera (A)
+- Collisions (M)
+- Entities (M)
+- Map design (A)
+- Shaders
+- Sound (M)
+- Stages (A)
+- UI (A)
+- World
