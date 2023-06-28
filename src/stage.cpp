@@ -37,6 +37,7 @@ void StageManager::changeStage(StageType newStage, int exitCode) {
     currentStage->onExit(exitCode);
     this->currentStage = stages[newStage];
     currentStage->onEnter(exitCode);
+    SDL_ShowCursor(!Game::instance->mouse_locked);
 }
 
     
@@ -54,6 +55,8 @@ void StageManager::update(double seconds_elapsed) {
 
 /* onEnter functions */
 void IntroStage::onEnter(int enterCode) {
+    Game::instance->mouse_locked = false;
+
     switch (enterCode) {
     default:
         break;
@@ -62,6 +65,7 @@ void IntroStage::onEnter(int enterCode) {
 
 void PlayStage::onEnter(int enterCode) {
 
+    Game::instance->mouse_locked = true;
 
     switch (enterCode) {
     default:
@@ -70,6 +74,7 @@ void PlayStage::onEnter(int enterCode) {
 }
 
 void OutroStage::onEnter(int enterCode) {
+    Game::instance->mouse_locked = false;
 
     switch (enterCode) {
     case 0:
