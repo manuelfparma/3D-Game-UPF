@@ -155,16 +155,12 @@ void World::update(double seconds_elapsed) {
 
 	// check if the game is lost
 	if (player->lives <= 0) {
-		player->walking_sound->pause();
-		player->slow_walking->pause();
 		Game::instance->stageManager->changeStage(OUTRO_STAGE, 0);
 		return;
 	}
 
 	// check if the game is won
 	if (checkPlayerExit()) {
-		player->walking_sound->pause();
-		player->slow_walking->pause();
 		Game::instance->stageManager->changeStage(OUTRO_STAGE, 1);
 		return;
 	}

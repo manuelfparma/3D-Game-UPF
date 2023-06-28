@@ -34,6 +34,9 @@ OutroStage::OutroStage() {
 
 /* StageManager definitions */
 void StageManager::changeStage(StageType newStage, int exitCode) {
+    Audio::Pause("walk");
+    Audio::Pause("slow");
+
     StageType currentStageType = this->currentStage->type;
 
     currentStage->onExit(exitCode);
