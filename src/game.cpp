@@ -132,7 +132,7 @@ void Game::onKeyDown( SDL_KeyboardEvent event )
 	switch(event.keysym.sym)
 	{
 		case SDLK_ESCAPE: return_to_start = true; break;
-		// case SDLK_F1: Shader::ReloadAll(); break; 
+		case SDLK_F1: Shader::ReloadAll(); break; 
 		case SDLK_F3: draw_gpu_stats = !draw_gpu_stats; break;
 	}
 }

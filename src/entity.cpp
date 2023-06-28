@@ -181,10 +181,6 @@ int getDirection(const Vector3& move_dir, const Vector3& move_right, const Vecto
 
 void EntityPlayer::update(float seconds_elapsed){
 	// give a half second to the world to load before the player
-	if (internal_time < 0.5) {
-		internal_time += seconds_elapsed;
-		return;
-	}
 
 	yaw -= Input::mouse_delta.x * seconds_elapsed * 10.f * DEG2RAD;
 	pitch -= Input::mouse_delta.y * seconds_elapsed * 10.f * DEG2RAD;
