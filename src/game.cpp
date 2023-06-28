@@ -28,6 +28,8 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	elapsed_time = 0.0f;
 	mouse_locked = false;
 
+	loadingScreen(window_width, window_height);
+
 	//OpenGL flags
 	glEnable( GL_CULL_FACE ); //render both sides of every triangle
 	glEnable( GL_DEPTH_TEST ); //check the occlusions using the Z buffer
@@ -50,6 +52,46 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	//hide the cursor
 	SDL_ShowCursor(!mouse_locked); //hide or show the mouse
+}
+
+void Game::loadingScreen(int window_width, int window_height) {
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0);
+
+	Shader* shader = Shader::Get("data/shaders/gui.vs", "data/shaders/hud.fs");
+	Mesh* background = new Mesh();
+	background->createQuad(window_width / 2.f, window_height / 2.f, window_width, window_height, true);
+
+	Camera* camera2D = new Camera();
+	camera2D->view_matrix = Matrix44();
+	camera2D->setOrthographic(0, window_width, 0, window_height, -1, 1);
+	camera2D->enable();
+
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
+
+	shader->enable();
+	shader->setUniform("u_viewprojection", Camera::current->viewprojection_matrix);
+	shader->setUniform("u_model", Matrix44());
+	shader->setUniform("u_color", color);
+	shader->setUniform("u_discard", true);
+	shader->setUniform("u_discard_color", Vector3(0.0f, 0.0f, 0.0f));
+
+	shader->setUniform("u_texture", Texture::Get("data/ui/ninja_bg.png"), 0);
+	background->render(GL_TRIANGLES);
+
+	float width = window_width,
+		height = window_height;
+
+	Mesh* loading = new Mesh();
+	loading->createQuad(width * 0.1, height * 0.1, 620 / 5, 235 / 5, true);
+	shader->setUniform("u_texture", Texture::Get("data/ui/loading.png"), 1);
+	loading->render(GL_TRIANGLES);
+
+	shader->disable();
+	SDL_GL_SwapWindow(this->window);
 }
 
 //what to do when the image has to be draw

@@ -51,6 +51,7 @@ public:
 	void onResize(int width, int height);
 
 	static Vector3 getPlayerPosition();
+	void loadingScreen(int window_width, int window_height);
 };
 
 
