@@ -518,30 +518,3 @@ void EntityArmy::render() {
 	// Disable shader after finishing rendering
 	shader->disable();
 }
-
-
-EntityUI::EntityUI(Mesh* UImesh, Shader* UIshader, Texture* UItexture, Vector4 UIcolor) {
-	mesh = UImesh;
-	shader = UIshader;
-	texture = UItexture;
-	color = UIcolor;
-}
-
-void EntityUI::render() {
-
-	Camera* camera = Camera::current;
-
-	shader->enable();
-	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
-	shader->setUniform("u_model", model);
-	shader->setUniform("u_color", color );
-	shader->setUniform("u_texture", texture, 0);
-
-	mesh->render(GL_TRIANGLES);
-
-	shader->disable();
-}
-
-
-void EntityUI::update(float seconds_elapsed) {
-}

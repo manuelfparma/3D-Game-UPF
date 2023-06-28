@@ -154,11 +154,3 @@ private:
 	float moveSpeed = 10.f;
 	float ATTENTION_TIME = 3.f;
 };
-
-
-class EntityUI : public EntityMesh {
-public:
-	EntityUI(Mesh* mesh, Shader* shader, Texture* texture, Vector4 color);
-	void render();
-	void update(float seconds_elapsed);
-};

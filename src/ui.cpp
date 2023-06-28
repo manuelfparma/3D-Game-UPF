@@ -18,13 +18,19 @@ UI::UI(int window_width, int window_height, EntityPlayer* UIplayer) {
 	Texture::Get("data/ui/artifact.png");
 	Texture::Get("data/ui/crosshair.png");
 
+	staminaContainer = new Mesh();
+	ability1 = new Mesh();
+	ability2 = new Mesh();
+	ability3 = new Mesh();
+	collectible = new Mesh();
+	crosshair = new Mesh();
+
 	createStaticMeshes();
 }
 
 
 void UI::createStaticMeshes() {
-	staminaContainer = new Mesh();
-	float startX = 0.2 * width;
+	float startX = 0.12 * width;
 	float startY = (1 - 0.07) * height;
 	float quadWidth = 0.2 * width;
 	float quadHeight = 0.05 * height;
@@ -33,25 +39,18 @@ void UI::createStaticMeshes() {
 
 	staminaContainer->createQuad(startX, startY, quadWidth, quadHeight, true);
 
-	startX = 0.1 * width;
+	startX = 0.05 * width;
 	startY = 0.15 * height;
 	float abilitySize = height * 0.1;
 
-	ability1 = new Mesh();
-	ability2 = new Mesh();
-	ability3 = new Mesh();
-
-	ability1->createQuad(startX * 1, startY, abilitySize, abilitySize, true);
-	ability2->createQuad(startX * 2, startY, abilitySize, abilitySize, true);
-	ability3->createQuad(startX * 3, startY, abilitySize, abilitySize, true);
+	ability1->createQuad(startX, startY, abilitySize, abilitySize, true);
+	ability2->createQuad(2 * (startX ) + abilitySize, startY, abilitySize, abilitySize, true);
+	ability3->createQuad(3 * (startX ) + abilitySize * 2, startY, abilitySize, abilitySize, true);
 
 
-	collectible = new Mesh();
-
-	collectible->createQuad(0.8 * width, (0.15) * height, height * 0.2, width * 0.2, true);
+	collectible->createQuad( 0.25 * width, (0.92) * height, height * 0.1, height * 0.1, true);
 
 
-	crosshair = new Mesh();
 	crosshair->createQuad(0.5 * width, 0.5 * height, height * 0.03, width * 0.03, true);
 }
 
@@ -84,7 +83,7 @@ void UI::render() {
 
 	std::ostringstream lives_str;
 	lives_str << "LIVES: " << max(player->lives, 0);
-	drawText(width * 0.10, height * 0.10, lives_str.str(), Vector3(1, 1, 1), 3);
+	drawText(width * 0.02, height * 0.10, lives_str.str(), Vector3(1, 1, 1), 3);
 };
 
 void UI::renderStatic() {
@@ -97,7 +96,9 @@ void UI::renderStatic() {
 
 void UI::renderDynamic() {
 	renderStaminaBar();
-	if (player->collectible_obtained) renderCollectible();
+	renderCollectible();
+
+	// if (player->collectible_obtained) renderCollectible();
 }
 
 
@@ -137,7 +138,7 @@ void UI::renderStaminaBar() {
 	
 	Mesh* staminaMesh = new Mesh();
 
-	float startX = 0.2 * width;
+	float startX = 0.12 * width;
 	float startY = (1 - 0.07) * height;
 	float quadWidth = 0.2 * width;
 	float quadHeight = 0.05 * height;

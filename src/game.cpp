@@ -38,18 +38,6 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	Audio::Init();	// this first because stages used sounds
 	stageManager = new StageManager();
 
-	/*
-	//load one texture without using the Texture Manager (Texture::Get would use the manager)
-	texture = new Texture();
- 	texture->load("data/texture.tga");
-
-	// example of loading Mesh from Mesh Manager
-	mesh = Mesh::Get("data/box.ASE");
-
-	// example of shader loading using the shaders manager
-	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
-	*/
-
 	//hide the cursor
 	SDL_ShowCursor(!mouse_locked); //hide or show the mouse
 }
