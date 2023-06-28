@@ -43,10 +43,6 @@ World::World(const char* sceneFilename) {
 	// open scene
 	parseScene(sceneFilename);
 
-	// play background music
-	Audio* music = Audio::Get("music");
-	bgMusic = music->play(0.3);
-
 	// fixme: first time calling this function is slow
 	// so we call it here to improve experience
 	checkEnemyMarking();
@@ -157,6 +153,8 @@ void World::update(double seconds_elapsed) {
 
 	// check if the game is lost
 	if (player->lives <= 0) {
+		player->walking_sound->pause();
+		player->slow_walking->pause();
 		Game::instance->stageManager->changeStage(OUTRO_STAGE, 0);
 		return;
 	}

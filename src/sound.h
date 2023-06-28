@@ -36,9 +36,12 @@ public:
 	static Audio* Get(const char* name);
 	// Play Manager API
 	static HCHANNEL Play(const char* name);
+	static HCHANNEL Play(const char* name, float volume);
 	static HCHANNEL Play3D(const char* name, Vector3 position);
 	// Stop sounds
 	static bool Stop(HCHANNEL channel);
+	static bool Stop(const char* name);
+	static bool Pause(const char* name);
 	// Set position of listener
 	static bool SetListener(Vector3 position);
 	static void SetSoundPosition(Audio* audio, Vector3 position);

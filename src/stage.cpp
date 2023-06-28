@@ -92,6 +92,9 @@ void IntroStage::createQuads(int width, int height) {
 
 /* onEnter functions */
 void IntroStage::onEnter(int enterCode) {
+    // play background music
+    Audio::Play("music", 0.5);
+
     Game::instance->mouse_locked = false;
 
     createQuads(Game::instance->window_width, Game::instance->window_height);
@@ -103,6 +106,8 @@ void IntroStage::onEnter(int enterCode) {
 }
 
 void PlayStage::onEnter(int enterCode) {
+    // play background music
+    Audio::Play("music", 0.5);
 
     Game::instance->mouse_locked = true;
 
@@ -115,13 +120,14 @@ void PlayStage::onEnter(int enterCode) {
 void OutroStage::onEnter(int enterCode) {
     Game::instance->mouse_locked = false;
     background->createQuad(Game::instance->window_width / 2.f, Game::instance->window_height / 2.f, Game::instance->window_width, Game::instance->window_height, true);
+    Audio::Pause("music");
 
     switch (enterCode) {
     case 0:
-        text = "You lose :(";
+        gameWon = false;
         break;
     case 1:
-        text = "You win!";
+        gameWon = true;
         break;
     default:
         break;
@@ -201,6 +207,9 @@ void OutroStage::render() {
 
     Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0);
 
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+
     camera2D->enable();
 
     shader->enable();
@@ -210,15 +219,29 @@ void OutroStage::render() {
     shader->setUniform("u_discard", true);
     shader->setUniform("u_discard_color", Vector3(0.0f, 0.0f, 0.0f));
 
-    shader->setUniform("u_texture", Texture::Get("data/texture.tga"), 0);
+    Texture* bg_image;
+    if (gameWon) {
+        bg_image = Texture::Get("data / texture.tga");
+    }
+    else {
+        bg_image = Texture::Get("data/ui/game_over.png");
+    }
 
+    shader->setUniform("u_texture", bg_image, 0);
     background->render(GL_TRIANGLES);
 
+    float width = Game::instance->window_width,
+        height = Game::instance->window_height;
+
+    if (addButton(width * 0.5f, height * 0.2f, 200, 100, "data/ui/restart_btn.png")) {
+        // restart button was pressed
+        restart = true;
+    }
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+
     shader->disable();
-
-    drawText(Game::instance->window_width / 2, Game::instance->window_height / 2, text, Vector3(1, 1, 1));
-    drawText(Game::instance->window_width / 2, Game::instance->window_height / 2 + 50, "Press R to restart", Vector3(1, 1, 1));
-
 }
 
 /* update functions */
@@ -236,7 +259,7 @@ void PlayStage::update(double seconds_elapsed) {
 
 void OutroStage::update(double seconds_elapsed) {
 
-    if (Input::wasKeyPressed(SDL_SCANCODE_R)) {
+    if (restart) {
         Game::instance->stageManager->changeStage(INTRO_STAGE, 0);
     }
 }

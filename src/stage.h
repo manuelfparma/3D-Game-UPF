@@ -65,7 +65,8 @@ public:
 
 class OutroStage : public Stage {
 public:
-	std::string text;
+	bool gameWon = false;
+	bool restart = false;
 	OutroStage();
 	virtual void render() override;
 	virtual void update(double seconds_elapsed) override;

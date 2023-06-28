@@ -36,7 +36,7 @@ Audio::Audio(SoundFile soundfile) {
 		soundfile.path.c_str(), 	// Filepath
 		0,							// Offset
 		0,							// Length
-		10,							// Max playbacks
+		1,							// Max playbacks
 		flags 						// Flags
 	);
 
@@ -92,10 +92,14 @@ Audio* Audio::Get(const char* name) {
 }
 
 HCHANNEL Audio::Play(const char* name) {
+	return Play(name, 1.0);
+}
+
+HCHANNEL Audio::Play(const char* name, float volume) {
 	// Play channel
 	Audio* audio = Get(name);
 	if (audio == nullptr) return 0;
-	return audio->play(1.0);
+	return audio->play(volume);
 }
 
 HCHANNEL Audio::Play3D(const char* name, Vector3 position) {
@@ -110,6 +114,14 @@ HCHANNEL Audio::Play3D(const char* name, Vector3 position) {
 
 bool Audio::Stop(HCHANNEL channel) {
 	return BASS_ChannelStop(channel);
+}
+
+bool Audio::Stop(const char* name) {
+	return Get(name)->stop();
+}
+
+bool Audio::Pause(const char* name) {
+	return Get(name)->pause();
 }
 
 bool Audio::SetListener(Vector3 position) {

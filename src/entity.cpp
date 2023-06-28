@@ -407,6 +407,8 @@ void EntityPlayer::render() {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		color = Vector4(1, 1, 1, 0.5);
 	}
+	else if (damage_cooldown > 0)
+			color = Vector4(1, 0, 0, 1);
 	else
 		color = Vector4(1, 1, 1, 1);
 	
