@@ -57,8 +57,8 @@ void UI::createStaticMeshes() {
 
 
 void UI::onResize(int width, int height) {
-	width = width;
-	height = height;
+	this->width = width;
+	this->height = height;
 	
 	createStaticMeshes();
 }
@@ -114,10 +114,10 @@ void UI::renderCrosshair() {
 void UI::renderAbilities() {
 	
 	shader->setUniform("u_texture", Texture::Get("data/ui/jump.png"), 0);
-	shader->setUniform("u_grayscale", player->jumps <= 0 || player->stamina < player->jump_cost);
+	shader->setUniform("u_grayscale", player->landlocked || player->jumps <= 0 || player->stamina < player->jump_cost);
 	ability1->render(GL_TRIANGLES);
 
-	shader->setUniform("u_grayscale", !player->dashes > 0 || player->stamina < player->dash_cost);
+	shader->setUniform("u_grayscale", player->landlocked || !(player->dashes > 0) || player->stamina < player->dash_cost);
 	shader->setUniform("u_texture", Texture::Get("data/ui/dash.png"), 0);
 	ability2->render(GL_TRIANGLES);
 
