@@ -219,21 +219,25 @@ void OutroStage::render() {
     shader->setUniform("u_discard", true);
     shader->setUniform("u_discard_color", Vector3(0.0f, 0.0f, 0.0f));
 
+
+    float width = Game::instance->window_width,
+        height = Game::instance->window_height;
     Texture* bg_image;
+    Vector2 btn_pos;
+
     if (gameWon) {
-        bg_image = Texture::Get("data / texture.tga");
+        bg_image = Texture::Get("data/ui/game_won.png");
+        btn_pos = Vector2(width * 0.5f, height * 0.5f);
     }
     else {
         bg_image = Texture::Get("data/ui/game_over.png");
+        btn_pos = Vector2(width * 0.5f, height * 0.2f);
     }
 
     shader->setUniform("u_texture", bg_image, 0);
     background->render(GL_TRIANGLES);
 
-    float width = Game::instance->window_width,
-        height = Game::instance->window_height;
-
-    if (addButton(width * 0.5f, height * 0.2f, 200, 100, "data/ui/restart_btn.png")) {
+    if (addButton(btn_pos.x, btn_pos.y, 200, 100, "data/ui/restart_btn.png")) {
         // restart button was pressed
         restart = true;
     }
