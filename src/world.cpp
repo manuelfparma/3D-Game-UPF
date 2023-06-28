@@ -151,6 +151,8 @@ void World::update(double seconds_elapsed) {
 		updateCamera(seconds_elapsed);
 	}
 
+	collectible->model.rotate(seconds_elapsed, Vector3(0,1,0));
+
 	// check if the game is lost
 	if (player->lives <= 0) {
 		player->walking_sound->pause();
