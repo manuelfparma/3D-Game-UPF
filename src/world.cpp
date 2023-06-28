@@ -452,9 +452,8 @@ bool World::parseScene(const char* filename)
 
 void World::onResize(int width, int height) {
 
-	ui->width = width;
-	ui->height = height;
 	camera->aspect = width / (float)height;
 	camera2D->setOrthographic(0, width, 0, height, -1, 1);
+	ui->onResize(width, height);
 
 }

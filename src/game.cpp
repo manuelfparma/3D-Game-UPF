@@ -155,11 +155,18 @@ void Game::onResize(int width, int height)
     std::cout << "window resized: " << width << "," << height << std::endl;
 	glViewport( 0,0, width, height );
 
-	stageManager->currentStage->world->onResize(width, height);
+	stageManager->currentStage->onResize(width, height);
 	window_width = width;
 	window_height = height;
 }
 
 Vector3 Game::getPlayerPosition() {
-	return instance->stageManager->currentStage->world->player->model.getTranslation();
+	PlayStage* current_stage = dynamic_cast<PlayStage*>(instance->stageManager->currentStage);
+
+	if (current_stage != nullptr) {
+		return current_stage->world->player->model.getTranslation();
+	}
+	else {
+		return Vector3(0.f, 0.f, 0.f);
+	}
 }

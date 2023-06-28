@@ -18,6 +18,49 @@ UI::UI(int window_width, int window_height, EntityPlayer* UIplayer) {
 	Texture::Get("data/ui/artifact.png");
 	Texture::Get("data/ui/crosshair.png");
 
+	createStaticMeshes();
+}
+
+
+void UI::createStaticMeshes() {
+	staminaContainer = new Mesh();
+	float startX = 0.2 * width;
+	float startY = (1 - 0.07) * height;
+	float quadWidth = 0.2 * width;
+	float quadHeight = 0.05 * height;
+	float stamina = player->stamina / 100.f;
+	float offset = (quadWidth * (1.f - stamina) * 0.5f);
+
+	staminaContainer->createQuad(startX, startY, quadWidth, quadHeight, true);
+
+	startX = 0.1 * width;
+	startY = 0.15 * height;
+	float abilitySize = height * 0.1;
+
+	ability1 = new Mesh();
+	ability2 = new Mesh();
+	ability3 = new Mesh();
+
+	ability1->createQuad(startX * 1, startY, abilitySize, abilitySize, true);
+	ability2->createQuad(startX * 2, startY, abilitySize, abilitySize, true);
+	ability3->createQuad(startX * 3, startY, abilitySize, abilitySize, true);
+
+
+	collectible = new Mesh();
+
+	collectible->createQuad(0.8 * width, (0.15) * height, height * 0.2, width * 0.2, true);
+
+
+	crosshair = new Mesh();
+	crosshair->createQuad(0.5 * width, 0.5 * height, height * 0.03, width * 0.03, true);
+}
+
+
+void UI::onResize(int width, int height) {
+	width = width;
+	height = height;
+	
+	createStaticMeshes();
 }
 
 void UI::render() {
@@ -57,58 +100,33 @@ void UI::renderDynamic() {
 
 void UI::renderContainers() {
 
-	Mesh* staminaContainer = new Mesh();
-	float startX = 0.2 * width;
-	float startY = (1 - 0.07) * height;
-	float quadWidth = 0.2 * width;
-	float quadHeight = 0.05 * height;
-	float stamina = player->stamina / 100.f;
-
-	float offset = (quadWidth * (1.f - stamina) * 0.5f);
-
-
-	staminaContainer->createQuad(startX, startY, quadWidth, quadHeight, true);
 	shader->setUniform("u_texture", Texture::getColorTexture(Vector3(200, 200, 200)), 0);
 	staminaContainer->render(GL_TRIANGLES);
 }
 
 void UI::renderCrosshair() {
 
-	Mesh* crosshair = new Mesh();
-	crosshair->createQuad(0.5 * width, 0.5 * height, height * 0.03, width * 0.03, true);
 	shader->setUniform("u_texture", Texture::Get("data/ui/crosshair.png"), 0);
 	crosshair->render(GL_TRIANGLES);
 
 }
 
 void UI::renderAbilities() {
-
-	Mesh* ability = new Mesh();
-
-	float startX = 0.1 * width;
-	float startY = 0.15 * height;
-	float abilitySize = height * 0.1;
-
-	ability->createQuad(startX * 1, startY, abilitySize, abilitySize, true);
+	
 	shader->setUniform("u_texture", Texture::Get("data/ui/jump.png"), 0);
 	shader->setUniform("u_grayscale", player->jumps <= 0 || player->stamina < player->jump_cost);
-	ability->render(GL_TRIANGLES);
+	ability1->render(GL_TRIANGLES);
 
-	ability->createQuad(startX * 2, startY, abilitySize, abilitySize, true);
 	shader->setUniform("u_grayscale", !player->dashes > 0 || player->stamina < player->dash_cost);
 	shader->setUniform("u_texture", Texture::Get("data/ui/dash.png"), 0);
-	ability->render(GL_TRIANGLES);
+	ability2->render(GL_TRIANGLES);
 
-	ability->createQuad(startX * 3, startY, abilitySize, abilitySize, true);
 	shader->setUniform("u_grayscale", player->invisible || player->stamina < player->invisible_cost);
 	shader->setUniform("u_texture", Texture::Get("data/ui/smoke_bomb.png"), 0);
-	ability->render(GL_TRIANGLES);
+	ability3->render(GL_TRIANGLES);
 
 
 	shader->setUniform("u_grayscale", false);
-
-	
-
 }
 
 void UI::renderStaminaBar() {
@@ -132,9 +150,6 @@ void UI::renderStaminaBar() {
 }
 
 void UI::renderCollectible() {
-	Mesh* collectible = new Mesh();
-
-	collectible->createQuad(0.8 * width, (0.15) * height, height * 0.2, width * 0.2, true);
 	shader->setUniform("u_texture", Texture::Get("data/ui/artifact.png"), 0);
 	collectible->render(GL_TRIANGLES);
 }

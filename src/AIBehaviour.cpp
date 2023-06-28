@@ -87,7 +87,7 @@ bool AIBehaviour::parseEnemyPath(int i) {
 }
 
 void AIBehaviour::update(float seconds_elapsed) {
-	World* world = Game::instance->stageManager->currentStage->world;
+	World* world = dynamic_cast<PlayStage*>(Game::instance->stageManager->currentStage)->world;
 	Vector3 player = world->player->model.getTranslation();
 	bool invisible_player = world->player->invisible;
 
@@ -140,7 +140,7 @@ void AIBehaviour::update(float seconds_elapsed) {
 }
 
 bool AIBehaviour::checkLineOfSight() {
-	World* world = Game::instance->stageManager->currentStage->world;
+	World* world = dynamic_cast<PlayStage*>(Game::instance->stageManager->currentStage)->world;
 
 	Vector3 player = world->player->model.getTranslation();
 	Vector3 front = mModel->frontVector();

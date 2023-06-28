@@ -236,7 +236,7 @@ void EntityPlayer::update(float seconds_elapsed){
 	velocity += move_dir * curSpeed;
 
 	std::vector<sCollisionData> collisions;
-	World* world = Game::instance->stageManager->currentStage->world;
+	World* world = dynamic_cast<PlayStage*>(Game::instance->stageManager->currentStage)->world;
 
 	// we suppose the player is on the air
 	bool onFloor = false;
