@@ -7,9 +7,11 @@
 #include <fstream>
 #include <map>
 #include <regex>
+#include "rendertotexture.h"
 
 //some globals
 Animation* anim = NULL;
+RenderToTexture* rt = NULL;
 float angle = 0;
 float mouse_speed = 100.0f;
 FBO* fbo = NULL;
@@ -36,6 +38,12 @@ World::World(const char* sceneFilename) {
 	Mesh* exitMesh = Mesh::Get("data/models/manhole.obj");
 	exit_mark = new EntityCollider(exitMesh, Texture::Get("data/textures/manhole.tga"), Shader::getDefaultShader("texture"));
 	exit_mark->model.setTranslation(EXIT_LOCATION);
+
+	if (!rt)
+	{
+		rt = new RenderToTexture();
+		rt->create(Game::instance->window_width, Game::instance->window_height);
+	}
 
 	createSkybox();
 	createEnemies();
@@ -92,6 +100,8 @@ void World::renderSky() {
 
 void World::render() {
 	camera->enable();
+
+	rt->enable();
 	renderSky();
 
 	if (!freeCam) {
@@ -132,6 +142,15 @@ void World::render() {
 
 	// enemies should be last to render because of z-buffer
 	enemies->render();
+
+	rt->disable();
+
+	glDisable(GL_DEPTH_TEST);
+
+	
+	rt->toViewport(Shader::Get("data/shaders/screen.vs", "data/shaders/vignetting.fs"));
+
+	glEnable(GL_DEPTH_TEST);
 
 	if (uiEnabled) {
 		camera2D->enable();
@@ -442,6 +461,8 @@ bool World::parseScene(const char* filename)
 
 void World::onResize(int width, int height) {
 
+
+	rt->create(Game::instance->window_width, Game::instance->window_height);
 	camera->aspect = width / (float)height;
 	camera2D->setOrthographic(0, width, 0, height, -1, 1);
 	ui->onResize(width, height);

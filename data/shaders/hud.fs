@@ -21,7 +21,6 @@ void main()
     }
 
     if (u_grayscale) {
-        // Convert the texture color to grayscale
         float grayscale = dot(textureColor.rgb, vec3(0.299, 0.587, 0.114));
         textureColor.rgb = vec3(grayscale);
     }
