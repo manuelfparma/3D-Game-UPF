@@ -80,8 +80,11 @@ void UI::render() {
 
 	shader->disable();
 
-	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 
+	std::ostringstream lives_str;
+	lives_str << "LIVES: " << max(player->lives, 0);
+	drawText(width * 0.10, height * 0.10, lives_str.str(), Vector3(1, 1, 1), 3);
 };
 
 void UI::renderStatic() {
