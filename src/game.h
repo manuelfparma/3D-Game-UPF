@@ -31,6 +31,8 @@ public:
 
 	//some vars
 	bool mouse_locked; //tells if the mouse is locked (not seen)
+	bool mouse_clicked = false;
+	Vector2 last_click; // saves the last point where the mouse has clicked
 
 	Game( int window_width, int window_height, SDL_Window* window );
 

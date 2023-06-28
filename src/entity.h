@@ -74,7 +74,7 @@ public:
 class EntityPlayer : public EntityCollider {
 public:
 	// Initial position
-	Vector3 initial_pos = Vector3(-200.f, 100.f, -27.f);
+	Vector3 initial_pos = Vector3(-200.f, 2.f, -27.f);
 
 	// Rotation
 	float yaw = 0.f;
@@ -104,7 +104,6 @@ public:
 	int dashes;
 	int jumps;
 	float game_time;
-	const int max_lives = 3;
 	int lives = 3;
 	const float DAMAGED_TIME = 10.f;
 	float damage_cooldown = 0.f;
@@ -114,6 +113,7 @@ public:
 	float invisible_time = 0;
 	bool collectible_obtained = false;
 
+	float internal_time = 0;
 
 	// bool isOnFloor = false;
 	float stamina = 100.0f;

@@ -17,11 +17,15 @@ class Stage
 		StageType type;
 		Camera* camera2D;
 
+		Shader* shader = Shader::Get("data/shaders/gui.vs", "data/shaders/hud.fs");
+		Mesh* background = new Mesh();
+
 		virtual void render() {};
 		virtual void update(double seconds_elapsed) {};
 		virtual void onResize(int width, int height);
 		virtual void onEnter(int enterCode) {};
 		virtual void onExit(int exitCode) {};
+		bool addButton(float center_x, float center_y, float w, float h, const char* filename);
 };
 
 class StageManager {
@@ -36,13 +40,16 @@ public:
 
 class IntroStage : public Stage {
 public:
-	Shader* shader = Shader::Get("data/shaders/gui.vs", "data/shaders/hud.fs");
-	Mesh* background = new Mesh();
+	bool start = false;
+
 	IntroStage();
+
+	void createQuads(int width, int height);
 	virtual void render() override;
 	virtual void update(double seconds_elapsed) override;
 	virtual void onEnter(int enterCode) override;
 	virtual void onExit(int exitCode) override;
+	virtual void onResize(int width, int height) override;
 };
 
 class PlayStage : public Stage {
@@ -59,8 +66,6 @@ public:
 class OutroStage : public Stage {
 public:
 	std::string text;
-	Shader* shader = Shader::Get("data/shaders/gui.vs", "data/shaders/hud.fs");
-	Mesh* background = new Mesh();
 	OutroStage();
 	virtual void render() override;
 	virtual void update(double seconds_elapsed) override;

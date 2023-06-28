@@ -114,8 +114,10 @@ void Game::onGamepadButtonUp(SDL_JoyButtonEvent event)
 
 void Game::onMouseButtonDown( SDL_MouseButtonEvent event )
 {
-	if (event.button == SDL_BUTTON_MIDDLE) //middle mouse
-	{
+	if (event.button == SDL_BUTTON_LEFT) {
+		mouse_clicked = true;
+		// we have to flip the value in Y as the quads start the zero on the other side
+		last_click = Vector2(event.x, window_height - event.y);
 	}
 }
 

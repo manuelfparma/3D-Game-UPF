@@ -3,8 +3,6 @@
 #include "animation.h"
 #include "input.h"
 
-
-
 /* Constructors */
 StageManager::StageManager() {
 	stages.push_back(new IntroStage());
@@ -55,13 +53,48 @@ void StageManager::update(double seconds_elapsed) {
     currentStage->update(seconds_elapsed);
 };
 
+static bool coordInside(float center_x, float center_y, float w, float h, float x, float y) {
+    return x > (center_x - w / 2) &&
+        x < (center_x + w / 2) &&
+        y > (center_y - h / 2) &&
+        y < (center_y + h / 2);
+}
 
+bool Stage::addButton(float center_x, float center_y, float w, float h, const char* filename) {
+    Mesh* button = new Mesh();
+    button->createQuad(
+        center_x,
+        center_y,
+        w,
+        h,
+        true
+    );
+    // render button
+    shader->setUniform("u_texture", Texture::Get(filename), 1);
+    button->render(GL_TRIANGLES);
+    // check if it was clicked
+    if (Game::instance->mouse_clicked) {
+        Game::instance->mouse_clicked = false;
+        if (coordInside(center_x, center_y, w, h, Game::instance->last_click.x, Game::instance->last_click.y))
+            return true;
+    }
+    return false;
+}
+
+void IntroStage::createQuads(int width, int height) {
+    background->createQuad(
+        width / 2.f, 
+        height / 2.f, 
+        width,
+        height, 
+        true);
+}
 
 /* onEnter functions */
 void IntroStage::onEnter(int enterCode) {
     Game::instance->mouse_locked = false;
 
-    background->createQuad(Game::instance->window_width / 2.f, Game::instance->window_height / 2.f, Game::instance->window_width, Game::instance->window_height, true);
+    createQuads(Game::instance->window_width, Game::instance->window_height);
 
     switch (enterCode) {
     default:
@@ -132,6 +165,9 @@ void IntroStage::render() {
 
     camera2D->enable();
 
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+
     shader->enable();
     shader->setUniform("u_viewprojection", Camera::current->viewprojection_matrix);
     shader->setUniform("u_model", Matrix44());
@@ -139,10 +175,19 @@ void IntroStage::render() {
     shader->setUniform("u_discard", true);
     shader->setUniform("u_discard_color", Vector3(0.0f, 0.0f, 0.0f));
 
-    shader->setUniform("u_texture", Texture::Get("data/texture.tga"), 0);
-
+    shader->setUniform("u_texture", Texture::Get("data/ui/ninja_bg.png"), 0);
     background->render(GL_TRIANGLES);
-    drawText(Game::instance->window_width / 2, Game::instance->window_height / 2, "Press P to play", Vector3(1, 1, 1));
+    
+    float width = Game::instance->window_width,
+        height = Game::instance->window_height;
+
+    if (addButton(width * 0.5f, height * 0.2f, 200, 100, "data/ui/start_btn.png")) {
+        // start button was pressed
+        start = true;
+    }
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
     shader->disable();
 }
@@ -179,7 +224,7 @@ void OutroStage::render() {
 /* update functions */
 void IntroStage::update(double seconds_elapsed) {
 
-    if (Input::wasKeyPressed(SDL_SCANCODE_P)) {
+    if (start) {
         Game::instance->stageManager->changeStage(PLAY_STAGE, 0);
     }
 
@@ -202,4 +247,9 @@ void Stage::onResize(int width, int height) {
 
 void PlayStage::onResize(int width, int height) {
     world->onResize(width, height);
+}
+
+void IntroStage::onResize(int width, int height) {
+    Stage::onResize(width, height);
+    createQuads(width, height);
 }
