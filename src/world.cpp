@@ -29,14 +29,12 @@ World::World(const char* sceneFilename) {
 	ui = new UI(Game::instance->window_width, Game::instance->window_height, player);
 
 
-	Mesh* collectibleMesh = new Mesh();
-	collectibleMesh->createCube();
-	collectible = new EntityCollider( collectibleMesh, Texture::getBlackTexture(), Shader::getDefaultShader("flat"));
+	Mesh* collectibleMesh = Mesh::Get("data/models/diamond.obj");
+	collectible = new EntityCollider( collectibleMesh, Texture::Get("data/textures/diamond.tga"), Shader::getDefaultShader("texture"));
 	collectible->model.setTranslation(COLLECTIBLE_LOCATION);
 
-	Mesh* exitMesh = new Mesh();
-	exitMesh->createCube();
-	exit_mark = new EntityCollider(exitMesh, Texture::getBlackTexture(), Shader::getDefaultShader("texture"));
+	Mesh* exitMesh = Mesh::Get("data/models/manhole.obj");
+	exit_mark = new EntityCollider(exitMesh, Texture::Get("data/textures/manhole.tga"), Shader::getDefaultShader("texture"));
 	exit_mark->model.setTranslation(EXIT_LOCATION);
 
 	createSkybox();
@@ -127,10 +125,11 @@ void World::render() {
 	}
 
     root->render(); 
+
 	if (!player->collectible_obtained)
 		collectible->render();
-	else
-		exit_mark->render();
+	
+	exit_mark->render();
 
 	if (freeCam || !firstPerson)
 		player->render();
@@ -187,7 +186,6 @@ void World::update(double seconds_elapsed) {
 	if (Input::wasKeyPressed(SDL_SCANCODE_E)) {
 		// player->playerAnimation->goToState(NINJA_POINT, 2.f);
 		if (checkCollectiblePickup()) {
-			std::cout << "collectible grabbed!\n";
 			player->landlocked = true;
 			player->collectible_obtained = true;
 		}

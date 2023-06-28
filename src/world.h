@@ -40,8 +40,8 @@ public:
 	int ENEMY_COUNT = 5;
 	float MAX_VIEW_DISTANCE = 50.f;
 
-	Vector3 COLLECTIBLE_LOCATION = Vector3(130.f, 5.f, 30.f);
-	Vector3 EXIT_LOCATION = Vector3(-175.f, 2.f, -27.f);
+	Vector3 COLLECTIBLE_LOCATION = Vector3(130.f, 2.f, 30.f);
+	Vector3 EXIT_LOCATION = Vector3(-175.f, 0.05f, -27.f);
 
 	World(const char* sceneFilename);
 	bool parseScene(const char* filename);
