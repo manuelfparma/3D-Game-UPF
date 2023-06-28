@@ -169,14 +169,13 @@ void World::update(double seconds_elapsed) {
     if (Game::instance->mouse_locked)
         Input::centerMouse();
 
-	if (Input::wasKeyPressed(SDL_SCANCODE_E)) {
-		if (checkCollectiblePickup()) {
-			player->landlocked = true;
-			player->collectible_obtained = true;
-		}
-		else {
+	if (checkCollectiblePickup()) {
+		player->landlocked = true;
+		player->collectible_obtained = true;
+	}
+
+	if (Input::wasKeyPressed(SDL_SCANCODE_E)) {	
 			checkEnemyMarking();
-		}
 	}
 
 #if DEBUG
@@ -314,18 +313,13 @@ bool World::testCollisionAgainstWorld(Vector3 rayOrigin, Vector3 direction, floa
 bool World::checkCollectiblePickup() {
 	if (player->collectible_obtained) return false;
 
-	Vector3 collectiblePos = collectible->model.getTranslation();
-	Vector3 playerPos = player->model.getTranslation();
-
-	Vector3 vector = playerPos - collectiblePos;
-
-	if (vector.length() > 10.f) return false;
-
-	Vector3 cameraVector = camera->center - camera->eye;
-
-	if (collectible->mesh->testRayCollision(collectible->model, camera->eye, normalize(cameraVector), Vector3(), Vector3(), 10.f)) return true;
-
-	return false;
+	return collectible->mesh->testSphereCollision(
+		collectible->model,
+		player->model.getTranslation() + Vector3(0, player->model_height / 2, 0),
+		1.f,
+		Vector3(),
+		Vector3()
+	);
 };
 
 bool World::checkPlayerExit() {
@@ -334,7 +328,7 @@ bool World::checkPlayerExit() {
 	return exit_mark->mesh->testSphereCollision(
 		exit_mark->model,
 		player->model.getTranslation(),
-		player->model_height,
+		1.f,
 		Vector3(),
 		Vector3()
 	);
