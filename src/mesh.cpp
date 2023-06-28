@@ -15,8 +15,7 @@
 #include "animation.h"
 #include "extra/coldet/coldet.h"
 
-//TODO: change to true for release
-bool Mesh::use_binary = false;			//checks if there is .wbin, it there is one tries to read it instead of the other file
+bool Mesh::use_binary = true;			//checks if there is .wbin, it there is one tries to read it instead of the other file
 bool Mesh::auto_upload_to_vram = true;	//uploads the mesh to the GPU VRAM to speed up rendering
 bool Mesh::interleave_meshes = true;	//places the geometry in an interleaved array
 

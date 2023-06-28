@@ -125,7 +125,10 @@ void Game::render(void)
 
 void Game::update(double seconds_elapsed)
 {
-
+	if (return_to_start) {
+		return_to_start = false;
+		stageManager->changeStage(INTRO_STAGE, 0);
+	}
 	stageManager->update(seconds_elapsed);
 
 }
@@ -135,8 +138,8 @@ void Game::onKeyDown( SDL_KeyboardEvent event )
 {
 	switch(event.keysym.sym)
 	{
-		case SDLK_ESCAPE: must_exit = true; break; //ESC key, kill the app
-		case SDLK_F1: Shader::ReloadAll(); break; 
+		case SDLK_ESCAPE: return_to_start = true; break; //ESC key, kill the app
+		// case SDLK_F1: Shader::ReloadAll(); break; 
 	}
 }
 

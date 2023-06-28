@@ -9,6 +9,8 @@
 #include "camera.h"
 #include "utils.h"
 
+#define DEBUG false
+
 class StageManager;
 
 class Game
@@ -28,6 +30,7 @@ public:
 	int fps;
 	bool must_exit;
 	StageManager* stageManager;
+	bool return_to_start = false;
 
 	//some vars
 	bool mouse_locked; //tells if the mouse is locked (not seen)

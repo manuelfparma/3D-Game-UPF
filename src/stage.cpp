@@ -74,7 +74,6 @@ bool Stage::addButton(float center_x, float center_y, float w, float h, const ch
     button->render(GL_TRIANGLES);
     // check if it was clicked
     if (Game::instance->mouse_clicked) {
-        Game::instance->mouse_clicked = false;
         if (coordInside(center_x, center_y, w, h, Game::instance->last_click.x, Game::instance->last_click.y))
             return true;
     }
@@ -92,6 +91,9 @@ void IntroStage::createQuads(int width, int height) {
 
 /* onEnter functions */
 void IntroStage::onEnter(int enterCode) {
+    start = false;
+    tutorial = false;
+
     // play background music
     Audio::Play("music", 0.5);
 
@@ -118,6 +120,8 @@ void PlayStage::onEnter(int enterCode) {
 }
 
 void OutroStage::onEnter(int enterCode) {
+    restart = false;
+
     Game::instance->mouse_locked = false;
     background->createQuad(Game::instance->window_width / 2.f, Game::instance->window_height / 2.f, Game::instance->window_width, Game::instance->window_height, true);
     Audio::Pause("music");
@@ -191,13 +195,20 @@ void IntroStage::render() {
     float width = Game::instance->window_width,
         height = Game::instance->window_height;
 
-    if (addButton(width * 0.5f, height * 0.1f, 200, 70, "data/ui/start_btn.png")) {
+    if (addButton(width * 0.3f, height * 0.1f, 200, 70, "data/ui/start_btn.png")) {
         // start button was pressed
         if (!tutorial)
             tutorial = true;
         else
             start = true;
     }
+
+    if (addButton(width * 0.7f, height * 0.1f, 200, 70, "data/ui/exit_btn.png")) {
+        Game::instance->must_exit = true;
+        std::cout << "exit\n";
+    }
+
+    Game::instance->mouse_clicked = false;
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -234,7 +245,7 @@ void OutroStage::render() {
 
     if (gameWon) {
         bg_image = Texture::Get("data/ui/game_won.png");
-        btn_pos = Vector2(width * 0.5f, height * 0.5f);
+        btn_pos = Vector2(width * 0.5f, height * 0.2f);
     }
     else {
         bg_image = Texture::Get("data/ui/game_over.png");

@@ -173,6 +173,17 @@ void World::update(double seconds_elapsed) {
     if (Game::instance->mouse_locked)
         Input::centerMouse();
 
+	if (Input::wasKeyPressed(SDL_SCANCODE_E)) {
+		if (checkCollectiblePickup()) {
+			player->landlocked = true;
+			player->collectible_obtained = true;
+		}
+		else {
+			checkEnemyMarking();
+		}
+	}
+
+#if DEBUG
 	if (Input::wasKeyPressed(SDL_SCANCODE_TAB)) {
 		Game::instance->mouse_locked = !Game::instance->mouse_locked;
 		SDL_ShowCursor(!Game::instance->mouse_locked);
@@ -183,18 +194,6 @@ void World::update(double seconds_elapsed) {
 		firstPerson = !firstPerson;
 	}
 
-	if (Input::wasKeyPressed(SDL_SCANCODE_E)) {
-		// player->playerAnimation->goToState(NINJA_POINT, 2.f);
-		if (checkCollectiblePickup()) {
-			player->landlocked = true;
-			player->collectible_obtained = true;
-		}
-		else {
-			checkEnemyMarking();
-		}
-	}
-
-	//TODO: remove
 	if (Input::wasKeyPressed(SDL_SCANCODE_X)) {
 		uiEnabled = !uiEnabled;
 	}
@@ -203,6 +202,7 @@ void World::update(double seconds_elapsed) {
 		Vector3 pos = player->model.getTranslation();
 		std::cout << pos.x << " " << pos.y << " " << pos.z << " " << std::endl;
 	}
+#endif
 }
 
 void World::updateCamera(double seconds_elapsed) {
