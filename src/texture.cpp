@@ -493,6 +493,16 @@ Texture* Texture::getWhiteTexture()
 	return white;
 }
 
+Texture* Texture::getColorTexture(Vector3 vec3)
+{
+	static Texture* texture = NULL;
+
+	const Uint8 data[3] = { vec3.x, vec3.y, vec3.z };
+
+	texture = new Texture(1, 1, GL_RGB, GL_UNSIGNED_BYTE, true, (Uint8*)data);
+	return texture;
+}
+
 void Texture::copyTo(Texture* destination, Shader* shader)
 {
 	glDisable(GL_DEPTH_TEST);
