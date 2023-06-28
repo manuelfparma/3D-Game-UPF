@@ -422,6 +422,9 @@ bool World::parseScene(const char* filename)
 			if (std::regex_match(mesh_name.c_str(), std::regex("data/meshes/House(1|2|3)\\.obj"))) {
 				new_entity = new EntityCollider(Mesh::Get(mesh_name.c_str()), Texture::Get("data/textures/house.tga"), Shader::Get("data/shaders/instanced.vs", "data/shaders/texture.fs"), render_data.models);
 			}
+			else if (std::regex_match(mesh_name.c_str(), std::regex("data/meshes/WallLogMesh\\.obj"))) {
+				new_entity = new EntityCollider(Mesh::Get(mesh_name.c_str()), Texture::Get("data/textures/log_texture.png"), Shader::Get("data/shaders/instanced.vs", "data/shaders/texture.fs"), render_data.models);
+			}
 			else {
 				new_entity = new EntityCollider(Mesh::Get(mesh_name.c_str()), defaultTexture, instancedShader, render_data.models);
 			}
