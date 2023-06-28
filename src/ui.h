@@ -7,14 +7,17 @@ public:
 	int height;
 	EntityPlayer* player;
 
+	Shader* shader;
 
-	EntityUI* stamina;
 
-
-	std::vector<EntityUI*> UIBackground;
-	std::vector<EntityUI*> UIElements;
 	UI(int width, int height, EntityPlayer* player);
-	void update();
 	void render();
+	void renderStatic();
+	void renderDynamic();
+	void renderContainers();
+	void renderCrosshair();
+	void renderStaminaBar();
+	void renderAbilities();
+	void renderArtifact();
 
 };
