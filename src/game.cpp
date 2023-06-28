@@ -27,6 +27,8 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	time = 0.0f;
 	elapsed_time = 0.0f;
 	mouse_locked = false;
+	draw_gpu_stats = false;
+
 
 	loadingScreen(window_width, window_height);
 
@@ -105,7 +107,10 @@ void Game::render(void)
 	stageManager->render();
 
 	//render the FPS, Draw Calls, etc
-	drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2);
+	if (draw_gpu_stats) {
+
+		drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2);
+	}
 
 	//swap between front buffer and back buffer
 	SDL_GL_SwapWindow(this->window);
@@ -126,8 +131,9 @@ void Game::onKeyDown( SDL_KeyboardEvent event )
 {
 	switch(event.keysym.sym)
 	{
-		case SDLK_ESCAPE: return_to_start = true; break; //ESC key, kill the app
+		case SDLK_ESCAPE: return_to_start = true; break;
 		// case SDLK_F1: Shader::ReloadAll(); break; 
+		case SDLK_F3: draw_gpu_stats = !draw_gpu_stats; break;
 	}
 }
 
